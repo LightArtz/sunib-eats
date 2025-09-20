@@ -72,7 +72,7 @@
                         <a href="#" class="card h-100 shadow-sm border-0 restaurant-card w-100">
                             {{-- Image is now wrapped in a container to control its boundaries --}}
                             <div class="card-img-container">
-                                <img src="{{ $restaurant->image_url ?? 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg/1920px-Good_Food_Display_-_NCI_Visuals_Online.jpg' }}" class="card-img-top" alt="{{ $restaurant->name }}">
+                                <img src="{{'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg/1920px-Good_Food_Display_-_NCI_Visuals_Online.jpg' }}" class="card-img-top" alt="{{ $restaurant->name }}">
                             </div>
                             <div class="card-body d-flex flex-column">
                                 {{-- Top section of the card body --}}
