@@ -19,6 +19,13 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
+
+            // yang biasanya ditambahin
+            $table->string('phone_number');
+            $table->date('date_of_birth');
+            $table->string('gender')->nullable();
+            $table->text('bio')->nullable();
+            $table->string('profile_picture')->nullable();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
