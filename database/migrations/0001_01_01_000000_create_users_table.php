@@ -21,8 +21,8 @@ return new class extends Migration
             $table->timestamps();
 
             // yang biasanya ditambahin
-            $table->string('phone_number');
-            $table->date('date_of_birth');
+            $table->string('phone_number')->nullable();
+            $table->date('date_of_birth')->nullable();
             $table->string('gender')->nullable();
             $table->text('bio')->nullable();
             $table->string('profile_picture')->nullable();
