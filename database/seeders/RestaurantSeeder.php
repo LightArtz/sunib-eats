@@ -7,6 +7,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str; // Wajib import ini untuk Slug
 
 class RestaurantSeeder extends Seeder
 {
@@ -16,52 +17,63 @@ class RestaurantSeeder extends Seeder
     public function run(): void
     {
         Schema::disableForeignKeyConstraints();
-
         DB::table('restaurants')->truncate();
-
         Schema::enableForeignKeyConstraints();
 
         $restaurants = [
             [
-                'resto_name' => 'Geprek Bensu',
-                'resto_location' => 'BSD',
-                'resto_rating' => 4.5,
-                'resto_pict' => 'https://placehold.co/600x400/orange/white?text=Geprek+Bensu',
+                'name' => 'Sate Khas Senayan',
+                'location' => 'Alam Sutera',
+                'description' => 'Hidangan khas Indonesia dengan cita rasa otentik dan suasana premium.',
+                'avg_rating' => 4.8,
+                'avg_price' => 75000,
+                'image_url' => 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop',
             ],
             [
-                'resto_name' => 'Sate Khas Senayan',
-                'resto_location' => 'Alam Sutera',
-                'resto_rating' => 4.8,
-                'resto_pict' => 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop',
+                'name' => 'Pizza Hut',
+                'location' => 'Gading Serpong',
+                'description' => 'Restoran pizza keluarga favorit dengan berbagai pilihan topping dan pasta.',
+                'avg_rating' => 4.2,
+                'avg_price' => 60000,
+                'image_url' => 'https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2070&auto=format&fit=crop',
             ],
             [
-                'resto_name' => 'Pizza Hut',
-                'resto_location' => 'Gading Serpong',
-                'resto_rating' => 4.2,
-                'resto_pict' => 'https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2070&auto=format&fit=crop',
+                'name' => 'Sushi Tei',
+                'location' => 'BSD',
+                'description' => 'Restoran Jepang modern dengan sushi belt dan bahan-bahan segar.',
+                'avg_rating' => 4.7,
+                'avg_price' => 120000,
+                'image_url' => 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?q=80&w=1974&auto=format&fit=crop',
             ],
             [
-                'resto_name' => 'Sushi Tei',
-                'resto_location' => 'BSD',
-                'resto_rating' => 4.7,
-                'resto_pict' => 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?q=80&w=1974&auto=format&fit=crop',
+                'name' => 'McDonald\'s',
+                'location' => 'Alam Sutera',
+                'description' => 'Restoran cepat saji global dengan burger dan ayam goreng ikonik.',
+                'avg_rating' => 4.1,
+                'avg_price' => 45000,
+                'image_url' => 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?q=80&w=2070&auto=format&fit=crop',
             ],
             [
-                'resto_name' => 'McDonald\'s',
-                'resto_location' => 'Alam Sutera',
-                'resto_rating' => 4.1,
-                'resto_pict' => 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?q=80&w=2070&auto=format&fit=crop',
-            ],
-            [
-                'resto_name' => 'Starbucks',
-                'resto_location' => 'Gading Serpong',
-                'resto_rating' => 4.6,
-                'resto_pict' => 'https://images.unsplash.com/photo-1559925393-8be0ec476acb?q=80&w=1974&auto=format&fit=crop',
+                'name' => 'Starbucks',
+                'location' => 'Gading Serpong',
+                'description' => 'Coffee shop populer untuk nongkrong dan bekerja.',
+                'avg_rating' => 4.6,
+                'avg_price' => 55000,
+                'image_url' => 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=1000&auto=format&fit=crop',
             ],
         ];
 
-        foreach ($restaurants as $restaurant) {
-            Restaurant::create($restaurant);
+        foreach ($restaurants as $item) {
+            Restaurant::create([
+                'name' => $item['name'],
+                'slug' => Str::slug($item['name']),
+                'location' => $item['location'],
+                'description' => $item['description'],
+                'avg_rating' => $item['avg_rating'],
+                'avg_price' => $item['avg_price'],
+                'image_url' => $item['image_url'],
+                'approved' => true,
+            ]);
         }
     }
 }

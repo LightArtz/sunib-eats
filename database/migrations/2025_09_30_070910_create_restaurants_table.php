@@ -13,11 +13,19 @@ return new class extends Migration
     {
         Schema::create('restaurants', function (Blueprint $table) {
             $table->id();
-            $table->string('resto_name');
-            $table->string('resto_location');
-            $table->decimal('resto_rating', 2, 1)->default(0.0);
-            $table->string('resto_pict')->nullable();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->text('description')->nullable();
+            $table->string('location')->default("Binus Alam Sutera");
+
+            $table->decimal('avg_rating', 3, 2)->default(0.00);
+            $table->unsignedBigInteger('avg_price')->default(0);
+            $table->integer('total_reviews')->default(0);
+
+            $table->string('image_url')->nullable();
+            $table->boolean('approved')->default(true);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
