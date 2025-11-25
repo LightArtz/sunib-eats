@@ -23,53 +23,55 @@ class CategorySeeder extends Seeder
 
         $categories = [
             // Kategori Harga
-            ['type' => 'price', 'name' => 'pricy'],
-            ['type' => 'price', 'name' => 'cheap'],
+            'pricy',
+            'cheap',
 
             // Kategori Negara
-            ['type' => 'country', 'name' => 'indonesian'],
-            ['type' => 'country', 'name' => 'chinese'],
-            ['type' => 'country', 'name' => 'japanese'],
-            ['type' => 'country', 'name' => 'korean'],
-            ['type' => 'country', 'name' => 'american'],
-            ['type' => 'country', 'name' => 'mexican'],
-            ['type' => 'country', 'name' => 'italian'],
-            ['type' => 'country', 'name' => 'thai'],
+            'indonesian',
+            'chinese',
+            'japanese',
+            'korean',
+            'american',
+            'mexican',
+            'italian',
+            'thai',
 
             // Kategori Jenis Makanan
-            ['type' => 'food_type', 'name' => 'nasi'],
-            ['type' => 'food_type', 'name' => 'ayam'],
-            ['type' => 'food_type', 'name' => 'sapi'],
-            ['type' => 'food_type', 'name' => 'babi'],
-            ['type' => 'food_type', 'name' => 'bakmi'],
-            ['type' => 'food_type', 'name' => 'seafood'],
-            ['type' => 'food_type', 'name' => 'sayur'],
-            ['type' => 'food_type', 'name' => 'soup'],
-            ['type' => 'food_type', 'name' => 'soto'],
-            ['type' => 'food_type', 'name' => 'ice cream'],
-            ['type' => 'food_type', 'name' => 'bobba'],
-            ['type' => 'food_type', 'name' => 'seblak'],
-            ['type' => 'food_type', 'name' => 'pizza'],
+            'nasi',
+            'ayam',
+            'sapi',
+            'babi',
+            'bakmi',
+            'seafood',
+            'sayur',
+            'soup',
+            'soto',
+            'ice cream',
+            'bobba',
+            'seblak',
+            'pizza',
 
             // Kategori Acara
-            ['type' => 'occasion', 'name' => 'kerja'],
-            ['type' => 'occasion', 'name' => 'nongkrong'],
+            'kerja',
+            'nongkrong',
 
             // Kategori Waktu
-            ['type' => 'time', 'name' => 'snack'],
-            ['type' => 'time', 'name' => 'sarapan'],
-            ['type' => 'time', 'name' => 'malam'],
+            'snack',
+            'sarapan',
+            'malam',
 
             // Kategori Tempat
-            ['type' => 'place', 'name' => 'all you can eat'],
-            ['type' => 'place', 'name' => 'restoran'],
-            ['type' => 'place', 'name' => 'street food'],
-            ['type' => 'place', 'name' => 'cafe'],
-            ['type' => 'place', 'name' => 'dessert'],
+            'all you can eat',
+            'restoran',
+            'street food',
+            'cafe',
+            'dessert',
         ];
 
         foreach ($categories as $category) {
-            Category::create($category);
+            Category::create([
+                'name' => $category
+            ]);
         }
     }
 }

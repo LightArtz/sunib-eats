@@ -17,4 +17,9 @@ class Restaurant extends Model
         'price_range',
         'image_url',
     ];
+
+    public function promotions()
+    {
+        return $this->hasMany(Promotion::class);
+    }
 }
