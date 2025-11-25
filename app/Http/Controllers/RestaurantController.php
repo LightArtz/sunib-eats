@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Food;
+use App\Models\Promotion;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -15,12 +17,14 @@ class RestaurantController extends Controller
 
         $restaurants = Restaurant::query()
             ->when($search, function ($query, $search) {
-                return $query->where('resto_name', 'like', "%{$search}%")
-                    ->orWhere('resto_location', 'like', "%{$search}%");
+                return $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%");
             })
-            ->paginate(6);
+            ->paginate(10);
 
-        return view('pages.home', ['restaurants' => $restaurants]);
+        $promotions = Promotion::with('restaurant')->get();
+
+        return view('pages.dashboard', ['restaurants' => $restaurants, 'promotions' => $promotions]);
     }
 
     public function show(Restaurant $restaurant)
