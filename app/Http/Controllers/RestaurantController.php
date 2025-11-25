@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Food;
 use App\Models\Promotion;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
@@ -29,8 +28,10 @@ class RestaurantController extends Controller
 
     public function show(Restaurant $restaurant)
     {
-        $restaurant->load('foods', 'reviews.user');
+        $restaurant->load(['promotions' => function ($query) {
+            $query->active();
+        }, 'reviews.user']);
 
-        return view('restaurant.show', compact('restaurant'));
+        return view('components.restaurant-detail', compact('restaurant'));
     }
 }
