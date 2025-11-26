@@ -40,4 +40,9 @@ class Restaurant extends Model
         if ($price < 100000) return '$$$';
         return '$$$$';
     }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
 }

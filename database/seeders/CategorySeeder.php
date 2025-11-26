@@ -3,75 +3,110 @@
 namespace Database\Seeders;
 
 use App\Models\Category;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 class CategorySeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         Schema::disableForeignKeyConstraints();
-
         DB::table('categories')->truncate();
-
         Schema::enableForeignKeyConstraints();
 
-        $categories = [
-            // Kategori Harga
-            'pricy',
-            'cheap',
+        $data = [
+            // Range Harga
+            'price_range' => [
+                'Cheap ($)',
+                'Affordable ($$)',
+                'Pricy ($$$)',
+                'Luxury ($$$$)'
+            ],
 
-            // Kategori Negara
-            'indonesian',
-            'chinese',
-            'japanese',
-            'korean',
-            'american',
-            'mexican',
-            'italian',
-            'thai',
+            // Asal Negara (Cuisine)
+            'country' => [
+                'Indonesian',
+                'Chinese',
+                'Japanese',
+                'Korean',
+                'American',
+                'Mexican',
+                'Italian',
+                'Thai',
+                'Western'
+            ],
 
-            // Kategori Jenis Makanan
-            'nasi',
-            'ayam',
-            'sapi',
-            'babi',
-            'bakmi',
-            'seafood',
-            'sayur',
-            'soup',
-            'soto',
-            'ice cream',
-            'bobba',
-            'seblak',
-            'pizza',
+            // Bahan Utama (Daging/Sayur) - Sesuai request kamu
+            'main_ingredient' => [
+                'Ayam',
+                'Sapi',
+                'Babi (Non-Halal)',
+                'Seafood',
+                'Ikan',
+                'Bebek',
+                'Sayuran (Vegan)'
+            ],
 
-            // Kategori Acara
-            'kerja',
-            'nongkrong',
+            // Jenis Hidangan (Dish Type)
+            'dish_type' => [
+                'Nasi',
+                'Bakmi',
+                'Soto',
+                'Soup',
+                'Pizza',
+                'Pasta',
+                'Burger',
+                'Steak',
+                'Seblak',
+                'Sate',
+                'Martabak'
+            ],
 
-            // Kategori Waktu
-            'snack',
-            'sarapan',
-            'malam',
+            // Minuman & Dessert
+            'dessert_drink' => [
+                'Coffee',
+                'Tea',
+                'Bobba',
+                'Ice Cream',
+                'Cake',
+                'Juice'
+            ],
+
+            // Suasana / Acara
+            'occasion' => [
+                'Nongkrong',
+                'Kerja / WFC',
+                'Date Night',
+                'Keluarga',
+                'Meeting'
+            ],
 
             // Kategori Tempat
-            'all you can eat',
-            'restoran',
-            'street food',
-            'cafe',
-            'dessert',
+            'place_type' => [
+                'Restoran',
+                'Street Food',
+                'Cafe',
+                'All You Can Eat',
+                'Bar / Lounge'
+            ],
+
+            // Waktu Makan
+            'meal_time' => [
+                'Sarapan',
+                'Lunch',
+                'Dinner',
+                'Snack Time'
+            ]
         ];
 
-        foreach ($categories as $category) {
-            Category::create([
-                'name' => $category
-            ]);
+        foreach ($data as $type => $categories) {
+            foreach ($categories as $name) {
+                Category::create([
+                    'type' => $type,
+                    'name' => $name
+                ]);
+            }
         }
     }
 }

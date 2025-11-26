@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Category;
 use App\Models\Restaurant;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -64,7 +65,7 @@ class RestaurantSeeder extends Seeder
         ];
 
         foreach ($restaurants as $item) {
-            Restaurant::create([
+            $newResto = Restaurant::create([
                 'name' => $item['name'],
                 'slug' => Str::slug($item['name']),
                 'location' => $item['location'],
@@ -74,6 +75,9 @@ class RestaurantSeeder extends Seeder
                 'image_url' => $item['image_url'],
                 'approved' => true,
             ]);
+
+            $randomCategories = Category::inRandomOrder()->limit(rand(4, 6))->pluck('id');
+            $newResto->categories()->attach($randomCategories);
         }
     }
 }
