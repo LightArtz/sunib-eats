@@ -9,7 +9,16 @@
 
         <div class="collapse navbar-collapse" id="mainNav">
             <form class="d-flex me-auto my-2 my-lg-0" action="{{ route('home') }}" method="GET">
-                <input class="form-control form-control-sm me-2" type="search" name="search" placeholder="Cari..." value="{{ request('search') }}">
+                <input class="form-control form-control-sm me-2"
+                    type="search"
+                    name="search"
+                    placeholder="Cari resto / lokasi..."
+                    value="{{ request('search') }}">
+
+                @if(request('sort'))
+                <input type="hidden" name="sort" value="{{ request('sort') }}">
+                @endif
+
                 <button class="btn btn-sm btn-outline-light" type="submit">Cari</button>
             </form>
 
@@ -29,19 +38,11 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
+
                         <li>
-                            <form class="d-flex me-auto my-2 my-lg-0" action="{{ route('home') }}" method="GET">
-                                <input class="form-control form-control-sm me-2"
-                                    type="search"
-                                    name="search"
-                                    placeholder="Cari resto / lokasi..."
-                                    value="{{ request('search') }}">
-
-                                @if(request('sort'))
-                                <input type="hidden" name="sort" value="{{ request('sort') }}">
-                                @endif
-
-                                <button class="btn btn-sm btn-outline-light" type="submit">Cari</button>
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <button type="submit" class="dropdown-item text-danger">Logout</button>
                             </form>
                         </li>
                     </ul>

@@ -18,10 +18,10 @@
                 <span>|</span>
                 <span class="fs-5 text-success fw-bold">
                     @if($restaurant->avg_price < 50000) $
-                    @elseif($restaurant->avg_price < 100000) $$
-                    @else $$$
-                    @endif
-                </span>
+                        @elseif($restaurant->avg_price < 100000) $$
+                            @else $$$
+                            @endif
+                            </span>
             </div>
 
             <p class="text-white-50 mt-3 d-none d-md-block mx-auto" style="max-width: 700px;">
@@ -92,65 +92,84 @@
                             <div class="text-warning small mb-2">
                                 @for($i = 1; $i <= 5; $i++)
                                     {{ $i <= $review->rating ? '★' : '☆' }}
-                                @endfor
+                                    @endfor
+                                    </div>
+
+                                    <p class="mb-0 text-dark">{{ $review->content }}</p>
+                            </div>
+                        </div>
+                        @empty
+                        <div class="text-center py-4 text-muted">
+                            <p>Belum ada ulasan. Jadilah yang pertama mereview restoran ini!</p>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-lg-4">
+
+                <div class="card shadow-sm border-0 sticky-top" style="top: 20px; z-index: 1;">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Tulis Ulasan</h5>
+                        @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {{ session('error') }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                        @endif
+
+                        @if ($errors->any())
+                        <div class="alert alert-danger">
+                            <ul class="mb-0 small">
+                                @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                        @endif
+
+                        @auth
+                        <form action="{{ route('reviews.store', $restaurant->id) }}" method="POST">
+                            @csrf
+
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Rating Anda</label>
+                                <select name="rating" class="form-select">
+                                    <option value="5">⭐⭐⭐⭐⭐ (5 - Sempurna)</option>
+                                    <option value="4">⭐⭐⭐⭐ (4 - Bagus)</option>
+                                    <option value="3">⭐⭐⭐ (3 - Biasa)</option>
+                                    <option value="2">⭐⭐ (2 - Kurang)</option>
+                                    <option value="1">⭐ (1 - Buruk)</option>
+                                </select>
                             </div>
 
-                            <p class="mb-0 text-dark">{{ $review->content }}</p>
+                            <div class="mb-3">
+                                <label class="form-label small text-muted">Pengalaman Anda</label>
+                                <textarea name="content" rows="3" class="form-control" placeholder="Makanannya enak, tempatnya nyaman..." required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100">Kirim Ulasan</button>
+                        </form>
+                        @else
+                        <div class="text-center py-3">
+                            <p class="small text-muted mb-3">Silakan login untuk menulis ulasan.</p>
+                            <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm w-100">Masuk / Daftar</a>
                         </div>
+                        @endauth
                     </div>
-                    @empty
-                    <div class="text-center py-4 text-muted">
-                        <p>Belum ada ulasan. Jadilah yang pertama mereview restoran ini!</p>
+                </div>
+
+                <div class="card shadow-sm border-0 mt-4">
+                    <div class="card-body">
+                        <h6 class="fw-bold">Jam Operasional</h6>
+                        <p class="small text-muted mb-0">Setiap Hari: 10:00 - 22:00 WIB</p>
+                        <hr>
+                        <h6 class="fw-bold">Kisaran Harga</h6>
+                        <p class="small text-muted mb-0">Rp {{ number_format($restaurant->avg_price, 0, ',', '.') }} / orang</p>
                     </div>
-                    @endforelse
                 </div>
+
             </div>
-            
-        </div> <div class="col-lg-4">
-
-            <div class="card shadow-sm border-0 sticky-top" style="top: 20px; z-index: 1;">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-3">Tulis Ulasan</h5>
-
-                    @auth
-                    <form action="{{ route('reviews.store', $restaurant->id) }}" method="POST">
-                        @csrf
-
-                        <div class="mb-3">
-                            <label class="form-label small text-muted">Rating Anda</label>
-                            <select name="rating" class="form-select">
-                                <option value="5">⭐⭐⭐⭐⭐ (5 - Sempurna)</option>
-                                <option value="4">⭐⭐⭐⭐ (4 - Bagus)</option>
-                                <option value="3">⭐⭐⭐ (3 - Biasa)</option>
-                                <option value="2">⭐⭐ (2 - Kurang)</option>
-                                <option value="1">⭐ (1 - Buruk)</option>
-                            </select>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label small text-muted">Pengalaman Anda</label>
-                            <textarea name="content" rows="3" class="form-control" placeholder="Makanannya enak, tempatnya nyaman..." required></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100">Kirim Ulasan</button>
-                    </form>
-                    @else
-                    <div class="text-center py-3">
-                        <p class="small text-muted mb-3">Silakan login untuk menulis ulasan.</p>
-                        <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm w-100">Masuk / Daftar</a>
-                    </div>
-                    @endauth
-                </div>
-            </div>
-
-            <div class="card shadow-sm border-0 mt-4">
-                <div class="card-body">
-                    <h6 class="fw-bold">Jam Operasional</h6>
-                    <p class="small text-muted mb-0">Setiap Hari: 10:00 - 22:00 WIB</p>
-                    <hr>
-                    <h6 class="fw-bold">Kisaran Harga</h6>
-                    <p class="small text-muted mb-0">Rp {{ number_format($restaurant->avg_price, 0, ',', '.') }} / orang</p>
-                </div>
-            </div>
-
-        </div> </div> </x-app-layout>
+        </div>
+</x-app-layout>

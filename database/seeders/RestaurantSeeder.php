@@ -4,21 +4,18 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Restaurant;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str; // Wajib import ini untuk Slug
+use Illuminate\Support\Str;
 
 class RestaurantSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         Schema::disableForeignKeyConstraints();
         DB::table('restaurants')->truncate();
+        DB::table('category_restaurant')->truncate();
         Schema::enableForeignKeyConstraints();
 
         $restaurants = [
@@ -29,6 +26,7 @@ class RestaurantSeeder extends Seeder
                 'avg_rating' => 4.8,
                 'avg_price' => 75000,
                 'image_url' => 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?q=80&w=1974&auto=format&fit=crop',
+                'categories' => ['Indonesian', 'Sate', 'Restoran', 'Keluarga', 'Lunch', 'Dinner'] 
             ],
             [
                 'name' => 'Pizza Hut',
@@ -37,6 +35,7 @@ class RestaurantSeeder extends Seeder
                 'avg_rating' => 4.2,
                 'avg_price' => 60000,
                 'image_url' => 'https://images.unsplash.com/photo-1513104890138-7c749659a591?q=80&w=2070&auto=format&fit=crop',
+                'categories' => ['American', 'Pizza', 'Pasta', 'Restoran', 'Keluarga', 'Lunch', 'Western']
             ],
             [
                 'name' => 'Sushi Tei',
@@ -45,6 +44,7 @@ class RestaurantSeeder extends Seeder
                 'avg_rating' => 4.7,
                 'avg_price' => 120000,
                 'image_url' => 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?q=80&w=1974&auto=format&fit=crop',
+                'categories' => ['Japanese', 'Seafood', 'Ikan', 'Restoran', 'Date Night', 'Luxury ($$$$)', 'Lunch']
             ],
             [
                 'name' => 'McDonald\'s',
@@ -53,6 +53,7 @@ class RestaurantSeeder extends Seeder
                 'avg_rating' => 4.1,
                 'avg_price' => 45000,
                 'image_url' => 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?q=80&w=2070&auto=format&fit=crop',
+                'categories' => ['American', 'Burger', 'Ayam', 'Street Food', 'Nongkrong', 'Affordable ($$)', 'Snack Time']
             ],
             [
                 'name' => 'Starbucks',
@@ -61,6 +62,7 @@ class RestaurantSeeder extends Seeder
                 'avg_rating' => 4.6,
                 'avg_price' => 55000,
                 'image_url' => 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=1000&auto=format&fit=crop',
+                'categories' => ['Coffee', 'Tea', 'Cake', 'Cafe', 'Nongkrong', 'Kerja / WFC', 'Pricy ($$$)']
             ],
         ];
 
@@ -76,8 +78,19 @@ class RestaurantSeeder extends Seeder
                 'approved' => true,
             ]);
 
-            $randomCategories = Category::inRandomOrder()->limit(rand(4, 6))->pluck('id');
-            $newResto->categories()->attach($randomCategories);
+            $priceCategoryName = '';
+            if ($item['avg_price'] < 30000) $priceCategoryName = 'Cheap ($)';
+            elseif ($item['avg_price'] < 50000) $priceCategoryName = 'Affordable ($$)';
+            elseif ($item['avg_price'] < 100000) $priceCategoryName = 'Pricy ($$$)';
+            else $priceCategoryName = 'Luxury ($$$$)';
+
+            if (!in_array($priceCategoryName, $item['categories'])) {
+                $item['categories'][] = $priceCategoryName;
+            }
+
+            $categoryIds = Category::whereIn('name', $item['categories'])->pluck('id');
+
+            $newResto->categories()->attach($categoryIds);
         }
     }
 }

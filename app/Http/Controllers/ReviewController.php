@@ -11,19 +11,36 @@ class ReviewController extends Controller
 {
     public function store(Request $request, Restaurant $restaurant)
     {
-        $request->validate([
+        $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string|max:1000',
+            'content' => 'required|string|max:500', 
         ]);
+
+        $existingReview = Review::where('user_id', Auth::id())
+                                ->where('restaurant_id', $restaurant->id)
+                                ->first();
+
+        if ($existingReview) {
+            return back()->with('error', 'Anda sudah pernah memberikan ulasan untuk restoran ini.');
+        }
 
         Review::create([
-            'restaurant_id' => $restaurant->id,
             'user_id' => Auth::id(),
-            'rating' => $request->rating,
-            'comment' => $request->comment,
+            'restaurant_id' => $restaurant->id,
+            'rating' => $validated['rating'],
+            'content' => $validated['content'],
         ]);
 
-        return back()->with('success', 'Terima kasih! Ulasan Anda telah disimpan.');
+        // Update rata-rata rating dan total review pada restoran
+        $newAvgRating = $restaurant->reviews()->avg('rating');
+        $newTotalReviews = $restaurant->reviews()->count();
+
+        $restaurant->update([
+            'avg_rating' => $newAvgRating,
+            'total_reviews' => $newTotalReviews
+        ]);
+
+        return back()->with('success', 'Terima kasih! Ulasan Anda berhasil ditambahkan.');
     }
 
     /**

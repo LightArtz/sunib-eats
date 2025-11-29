@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
+use App\Models\Category; 
 use App\Models\Promotion;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 
 class RestaurantController extends Controller
 {
@@ -25,11 +23,19 @@ class RestaurantController extends Controller
                         ->orWhere('location', 'like', "%{$search}%");
                 });
             })
-            // Filter Logic
-            ->when($selectedCategories, function ($query, $categories) {
-                return $query->whereHas('categories', function ($q) use ($categories) {
-                    $q->whereIn('categories.id', $categories);
-                });
+            // Filter Logic 
+            ->when($selectedCategories, function ($query, $categoryIds) {
+                $categories = Category::whereIn('id', $categoryIds)->get();
+                
+                $groupedCategories = $categories->groupBy('type');
+                
+                foreach ($groupedCategories as $type => $cats) {
+                    $ids = $cats->pluck('id');
+                    
+                    $query->whereHas('categories', function ($q) use ($ids) {
+                        $q->whereIn('categories.id', $ids);
+                    });
+                }
             })
             // Sort Logic
             ->when($sort, function ($query, $sort) {
@@ -46,7 +52,6 @@ class RestaurantController extends Controller
             ->withQueryString();
 
         $promotions = Promotion::with('restaurant')->get();
-
         $categories = Category::all()->groupBy('type');
 
         return view('pages.dashboard', [
@@ -55,6 +60,7 @@ class RestaurantController extends Controller
             'categories' => $categories
         ]);
     }
+
     public function show(Restaurant $restaurant)
     {
         $restaurant->load(['promotions' => function ($query) {
