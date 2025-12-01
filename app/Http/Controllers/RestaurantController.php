@@ -2,60 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category; 
+use App\Models\Category;
 use App\Models\Promotion;
 use App\Models\Restaurant;
+use App\Services\RestaurantService;
 use Illuminate\Http\Request;
 
 class RestaurantController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, RestaurantService $restaurantService)
     {
-        $search = $request->input('search');
-        $sort = $request->input('sort');
-        $selectedCategories = $request->input('categories');
+        $hotRestaurants = $restaurantService->getHotRestaurants(4);
+        $hotIds = $hotRestaurants->pluck('id')->toArray();
+        // Disini hot restaurant sudah diambil dari Service/RestaurantService.php
 
         $restaurants = Restaurant::query()
-            // Search Logic
-            ->when($search, function ($query, $search) {
-                return $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('location', 'like', "%{$search}%");
-                });
-            })
-            // Filter Logic 
-            ->when($selectedCategories, function ($query, $categoryIds) {
-                $categories = Category::whereIn('id', $categoryIds)->get();
-                
-                $groupedCategories = $categories->groupBy('type');
-                
-                foreach ($groupedCategories as $type => $cats) {
-                    $ids = $cats->pluck('id');
-                    
-                    $query->whereHas('categories', function ($q) use ($ids) {
-                        $q->whereIn('categories.id', $ids);
-                    });
-                }
-            })
-            // Sort Logic
-            ->when($sort, function ($query, $sort) {
-                if ($sort == 'rating_desc') return $query->orderByDesc('avg_rating');
-                if ($sort == 'price_asc') return $query->orderBy('avg_price', 'asc');
-                if ($sort == 'price_desc') return $query->orderByDesc('avg_price');
-                if ($sort == 'newest') return $query->latest();
-                return $query;
-            })
-            ->when(!$sort, function ($query) {
-                return $query->latest();
-            })
-            ->paginate(10)
+            ->whereNotIn('id', $hotIds)
+            ->search($request->input('search'))
+            ->filterByCategories($request->input('categories'))
+            ->sortBy($request->input('sort'))
+            ->paginate(8)
             ->withQueryString();
+        // Semua logic disini diambil dari Business Logic di Model/Restaurant.php
 
-        $promotions = Promotion::with('restaurant')->get();
+        $promotions = Promotion::with('restaurant')->whereDate('start_date', '<=', now())
+            ->whereDate('end_date', '>=', now())
+            ->get();
         $categories = Category::all()->groupBy('type');
 
         return view('pages.dashboard', [
             'restaurants' => $restaurants,
+            'hotRestaurants' => $hotRestaurants,
             'promotions' => $promotions,
             'categories' => $categories
         ]);

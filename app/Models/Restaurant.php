@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,7 +20,8 @@ class Restaurant extends Model
         'avg_price',
         'total_reviews',
         'image_url',
-        'approved'
+        'approved',
+        'hot_score',
     ];
 
     public function promotions()
@@ -32,17 +34,55 @@ class Restaurant extends Model
         return $this->hasMany(Review::class);
     }
 
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'category_restaurant');
+    }
+
     public function getPriceSymbolAttribute()
     {
         $price = $this->avg_price;
         if ($price < 30000) return '$';
         if ($price < 50000) return '$$';
         if ($price < 100000) return '$$$';
-        return '$$$$';
+        if ($price < 250000) return '$$$$';
+        return '$$$$$';
     }
 
-    public function categories()
+    public function scopeSearch(Builder $query, $search)
     {
-        return $this->belongsToMany(Category::class, 'category_restaurant');
+        return $query->when($search, function ($q) use ($search) {
+            $q->where(function ($subQ) use ($search) {
+                $subQ->where('name', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%");
+            });
+        });
+    }
+
+    public function scopeFilterByCategories(Builder $query, $categories)
+    {
+        return $query->when($categories, function ($q) use ($categories) {
+            $catsData = Category::whereIn('id', $categories)->get()->groupBy('type');
+
+            foreach ($catsData as $type => $cats) {
+                $ids = $cats->pluck('id');
+                $q->whereHas('categories', function ($subQ) use ($ids) {
+                    $subQ->whereIn('categories.id', $ids);
+                });
+            }
+        });
+    }
+
+    public function scopeSortBy(Builder $query, $sort)
+    {
+        return $query->when($sort, function ($q) use ($sort) {
+            if ($sort == 'rating_desc') return $q->orderByDesc('avg_rating');
+            if ($sort == 'price_asc') return $q->orderBy('avg_price', 'asc');
+            if ($sort == 'price_desc') return $q->orderByDesc('avg_price');
+            if ($sort == 'newest') return $q->latest();
+            return $q;
+        }, function ($q) {
+            return $q->inRandomOrder();
+        });
     }
 }

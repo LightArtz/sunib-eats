@@ -101,14 +101,36 @@
         </div>
 
         <div class="col-lg-9">
+
+            @if(!request('search') && !request('categories'))
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h3 class="fw-bold m-0">🔥 Hot Recommendations</h3>
+                    <h3 class="fw-bold m-0 text-danger">🔥 Hot Recommendations</h3>
+                    <small class="text-muted">Paling hits minggu ini!</small>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+                @foreach($hotRestaurants as $hotResto) <div class="col-12">
+                    @include('components.restaurant-card', ['restaurant' => $hotResto])
+                </div>
+                @endforeach
+            </div>
+
+            <hr class="my-5"> @endif
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    @if(request('search') || request('categories'))
+                    <h3 class="fw-bold m-0">Hasil Pencarian</h3>
                     @if(request('search'))
-                    <small class="text-muted">Hasil cari: "<strong>{{ request('search') }}</strong>"</small>
+                    <small class="text-muted">Kata kunci: "<strong>{{ request('search') }}</strong>"</small>
+                    @endif
+                    @else
+                    <h3 class="fw-bold m-0">✨ Daily Recommendations</h3>
+                    <small class="text-muted">Pilihan menarik lainnya untuk kamu</small>
                     @endif
                 </div>
-                <div class="d-lg-none"></div>
             </div>
 
             <div class="row g-4">

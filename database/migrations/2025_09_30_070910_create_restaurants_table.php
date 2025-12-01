@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('avg_rating', 3, 2)->default(0.00);
             $table->unsignedBigInteger('avg_price')->default(0);
             $table->integer('total_reviews')->default(0);
+            $table->decimal('hot_score', 10, 2)->default(0)->index();
 
             $table->string('image_url')->nullable();
             $table->boolean('approved')->default(true);

@@ -6,6 +6,7 @@ use App\Models\Restaurant;
 use App\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ReviewController extends Controller
 {
@@ -13,55 +14,74 @@ class ReviewController extends Controller
     {
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'content' => 'required|string|max:500', 
+            'content' => 'required|string|max:500',
+            'price_per_portion' => 'required|numeric|min:1000',
         ]);
 
         $existingReview = Review::where('user_id', Auth::id())
-                                ->where('restaurant_id', $restaurant->id)
-                                ->first();
+            ->where('restaurant_id', $restaurant->id)
+            ->first();
 
         if ($existingReview) {
-            return back()->with('error', 'Anda sudah pernah memberikan ulasan untuk restoran ini.');
+            return back()->with('error', 'Anda sudah mereview tempat ini.');
         }
 
-        Review::create([
-            'user_id' => Auth::id(),
-            'restaurant_id' => $restaurant->id,
-            'rating' => $validated['rating'],
-            'content' => $validated['content'],
-        ]);
+        DB::transaction(function () use ($request, $restaurant, $validated) {
+            $review = Review::create([
+                'user_id' => Auth::id(),
+                'restaurant_id' => $restaurant->id,
+                'rating' => $validated['rating'],
+                'content' => $validated['content'],
+                'price_per_portion' => $validated['price_per_portion'],
+            ]);
 
-        // Update rata-rata rating dan total review pada restoran
-        $newAvgRating = $restaurant->reviews()->avg('rating');
-        $newTotalReviews = $restaurant->reviews()->count();
+            $this->recalculateRestaurantStats($restaurant);
+        });
 
-        $restaurant->update([
-            'avg_rating' => $newAvgRating,
-            'total_reviews' => $newTotalReviews
-        ]);
-
-        return back()->with('success', 'Terima kasih! Ulasan Anda berhasil ditambahkan.');
+        return back()->with('success', 'Ulasan berhasil ditambahkan!');
     }
 
-    /**
-     * @param  \Illuminate\Http\Request  
-     * @param  \App\Models\Review  
-     * @return \Illuminate\Http\RedirectResponse
-     */
     public function update(Request $request, Review $review)
     {
-        if ($review->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        if ($review->user_id !== Auth::id()) abort(403);
 
-        $request->validate([
+        $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string|max:1000',
+            'content' => 'required|string',
         ]);
 
-        $review->update($request->only('rating', 'comment'));
+        DB::transaction(function () use ($request, $review, $validated) {
+            $history = $review->edit_history ?? [];
+            $history[] = [
+                'date' => now()->toDateTimeString(),
+                'old_content' => $review->content,
+                'old_rating' => $review->rating,
+            ];
 
-        return back()->with('success', 'Ulasan Anda berhasil diperbarui.');
+            $review->update([
+                'rating' => $validated['rating'],
+                'content' => $validated['content'],
+                'edited_at' => now(),
+                'edit_history' => $history
+            ]);
+
+            $this->recalculateRestaurantStats($review->restaurant);
+        });
+
+        return back()->with('success', 'Ulasan berhasil diedit.');
+    }
+
+    private function recalculateRestaurantStats(Restaurant $restaurant)
+    {
+        $avgRating = $restaurant->reviews()->avg('rating');
+        $avgPrice = $restaurant->reviews()->avg('price_per_portion');
+        $totalReviews = $restaurant->reviews()->count();
+
+        $restaurant->update([
+            'avg_rating' => $avgRating,
+            'avg_price' => $avgPrice,
+            'total_reviews' => $totalReviews
+        ]);
     }
 
     /**
