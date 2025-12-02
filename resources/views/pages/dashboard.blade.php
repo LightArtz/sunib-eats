@@ -16,7 +16,18 @@
                         <span class="badge bg-danger mb-2">PROMO SPESIAL</span>
                         <h2 class="fw-bold text-white">{{ $promo->title }}</h2>
                         <p class="mb-3 d-none d-lg-block">{{ $promo->description }}</p>
-                        <a href="{{ route('restaurants.show', $promo->restaurant->slug ?? $promo->restaurant->id) }}" class="btn btn-warning fw-bold mt-1 px-4">Lihat Promo</a>
+                        @if($promo->restaurant)
+                        <a href="{{ route('restaurants.show', $promo->restaurant) }}"
+                            class="btn btn-warning fw-bold mt-1 px-4 position-relative"
+                            style="z-index: 10;">
+                            Lihat Promo
+                        </a>
+                        @else
+                        <button class="btn btn-secondary fw-bold mt-1 px-4 position-relative"
+                            style="z-index: 10;" disabled>
+                            Promo Berakhir
+                        </button>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -43,6 +54,40 @@
                         @if(request('search'))
                         <input type="hidden" name="search" value="{{ request('search') }}">
                         @endif
+
+                        <div class="mb-4">
+                            <h6 class="fw-bold text-uppercase text-muted small mb-3">Harga</h6>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="price" value="1"
+                                    {{ request('price') == '1' ? 'checked' : '' }}>
+                                <label class="form-check-label small">Cheap ($)</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="price" value="2"
+                                    {{ request('price') == '2' ? 'checked' : '' }}>
+                                <label class="form-check-label small">Affordable ($$)</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="price" value="3"
+                                    {{ request('price') == '3' ? 'checked' : '' }}>
+                                <label class="form-check-label small">Pricy ($$$)</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="price" value="4"
+                                    {{ request('price') == '4' ? 'checked' : '' }}>
+                                <label class="form-check-label small">Premium ($$$$)</label>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="price" value="5"
+                                    {{ request('price') == '5' ? 'checked' : '' }}>
+                                <label class="form-check-label small">Luxury ($$$$$)</label>
+                            </div>
+                        </div>
 
                         @if(isset($categories))
                         @foreach($categories as $type => $catList)
@@ -101,8 +146,7 @@
         </div>
 
         <div class="col-lg-9">
-
-            @if(!request('search') && !request('categories'))
+            @if(!request()->hasAny(['search', 'categories', 'price', 'sort']))
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h3 class="fw-bold m-0 text-danger">🔥 Hot Recommendations</h3>
@@ -111,21 +155,44 @@
             </div>
 
             <div class="row g-4 mb-5">
-                @foreach($hotRestaurants as $hotResto) <div class="col-12">
+                @foreach($hotRestaurants as $hotResto)
+                <div class="col-12">
                     @include('components.restaurant-card', ['restaurant' => $hotResto])
                 </div>
                 @endforeach
             </div>
 
-            <hr class="my-5"> @endif
+            <hr class="my-5">
+            @endif
 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    @if(request('search') || request('categories'))
+                    @if(request()->hasAny(['search', 'categories', 'price', 'sort']))
                     <h3 class="fw-bold m-0">Hasil Pencarian</h3>
-                    @if(request('search'))
-                    <small class="text-muted">Kata kunci: "<strong>{{ request('search') }}</strong>"</small>
-                    @endif
+
+                    <div class="mt-1 small text-muted">
+                        Menampilkan hasil untuk:
+                        @if(request('search'))
+                        <span class="badge bg-light text-dark border">"{{ request('search') }}"</span>
+                        @endif
+                        @if(request('price'))
+                        @php
+                        $priceLabels = [
+                        '1' => 'Cheap ($)',
+                        '2' => 'Affordable ($$)',
+                        '3' => 'Pricy ($$$)',
+                        '4' => 'Premium ($$$$)',
+                        '5' => 'Luxury ($$$$$)'
+                        ];
+                        @endphp
+                        <span class="badge bg-light text-dark border">
+                            {{ $priceLabels[request('price')] }}
+                        </span>
+                        @endif
+                        @if(request('categories'))
+                        <span class="badge bg-light text-dark border">{{ count(request('categories')) }} Kategori</span>
+                        @endif
+                    </div>
                     @else
                     <h3 class="fw-bold m-0">✨ Daily Recommendations</h3>
                     <small class="text-muted">Pilihan menarik lainnya untuk kamu</small>
@@ -140,6 +207,15 @@
                 </div>
                 @endforeach
             </div>
+
+            {{-- Pesan jika tidak ada hasil --}}
+            @if($restaurants->count() == 0)
+            <div class="text-center py-5">
+                <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="Empty" style="width: 100px; opacity: 0.5;">
+                <p class="text-muted mt-3">Tidak ada restoran yang cocok dengan filter kamu.</p>
+                <a href="{{ route('home') }}" class="btn btn-outline-primary btn-sm">Reset Filter</a>
+            </div>
+            @endif
 
             <div class="mt-5 d-flex justify-content-center">
                 {{ $restaurants->links() }}

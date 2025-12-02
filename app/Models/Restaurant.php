@@ -59,6 +59,19 @@ class Restaurant extends Model
         });
     }
 
+    public function scopeFilterPrice(Builder $query, $level)
+    {
+        if (!$level) return $query;
+
+        return $query->where(function ($q) use ($level) {
+            if ($level == '1')      $q->where('avg_price', '<', 30000);
+            elseif ($level == '2')  $q->whereBetween('avg_price', [30000, 49999]);
+            elseif ($level == '3')  $q->whereBetween('avg_price', [50000, 99999]);
+            elseif ($level == '4')  $q->whereBetween('avg_price', [100000, 249999]);
+            elseif ($level == '5')  $q->where('avg_price', '>=', 250000);
+        });
+    }
+
     public function scopeFilterByCategories(Builder $query, $categories)
     {
         return $query->when($categories, function ($q) use ($categories) {
@@ -84,5 +97,10 @@ class Restaurant extends Model
         }, function ($q) {
             return $q->inRandomOrder();
         });
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
     }
 }

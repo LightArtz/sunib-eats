@@ -13,22 +13,25 @@ class RestaurantController extends Controller
     public function index(Request $request, RestaurantService $restaurantService)
     {
         $hotRestaurants = $restaurantService->getHotRestaurants(4);
-        $hotIds = $hotRestaurants->pluck('id')->toArray();
         // Disini hot restaurant sudah diambil dari Service/RestaurantService.php
 
         $restaurants = Restaurant::query()
-            ->whereNotIn('id', $hotIds)
             ->search($request->input('search'))
+            ->filterPrice($request->input('price'))
             ->filterByCategories($request->input('categories'))
             ->sortBy($request->input('sort'))
             ->paginate(8)
             ->withQueryString();
         // Semua logic disini diambil dari Business Logic di Model/Restaurant.php
 
-        $promotions = Promotion::with('restaurant')->whereDate('start_date', '<=', now())
+        $promotions = Promotion::with('restaurant')
+            ->whereDate('start_date', '<=', now())
             ->whereDate('end_date', '>=', now())
             ->get();
-        $categories = Category::all()->groupBy('type');
+
+        $categories = Category::where('type', '!=', 'price_range')
+            ->get()
+            ->groupBy('type');
 
         return view('pages.dashboard', [
             'restaurants' => $restaurants,

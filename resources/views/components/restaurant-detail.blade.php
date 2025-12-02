@@ -17,11 +17,8 @@
                 </span>
                 <span>|</span>
                 <span class="fs-5 text-success fw-bold">
-                    @if($restaurant->avg_price < 50000) $
-                        @elseif($restaurant->avg_price < 100000) $$
-                            @else $$$
-                            @endif
-                            </span>
+                    {{ $restaurant->price_symbol }}
+                </span>
             </div>
 
             <p class="text-white-50 mt-3 d-none d-md-block mx-auto" style="max-width: 700px;">

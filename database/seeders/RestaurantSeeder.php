@@ -5,19 +5,12 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Restaurant;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class RestaurantSeeder extends Seeder
 {
     public function run(): void
     {
-        Schema::disableForeignKeyConstraints();
-        DB::table('restaurants')->truncate();
-        DB::table('category_restaurant')->truncate();
-        Schema::enableForeignKeyConstraints();
-
         $restaurants = [
             [
                 'name' => 'Sate Khas Senayan',
@@ -44,7 +37,7 @@ class RestaurantSeeder extends Seeder
                 'avg_rating' => 4.7,
                 'avg_price' => 120000,
                 'image_url' => 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=800&q=80',
-                'categories' => ['Japanese', 'Seafood', 'Ikan', 'Restoran', 'Date Night', 'Luxury ($$$$)', 'Lunch']
+                'categories' => ['Japanese', 'Seafood', 'Ikan', 'Restoran', 'Date Night', 'Lunch']
             ],
             [
                 'name' => 'McDonald\'s',
@@ -53,7 +46,7 @@ class RestaurantSeeder extends Seeder
                 'avg_rating' => 4.1,
                 'avg_price' => 45000,
                 'image_url' => 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80',
-                'categories' => ['American', 'Burger', 'Ayam', 'Street Food', 'Nongkrong', 'Affordable ($$)', 'Snack Time']
+                'categories' => ['American', 'Burger', 'Ayam', 'Street Food', 'Nongkrong', 'Snack Time']
             ],
             [
                 'name' => 'Starbucks',
@@ -89,7 +82,7 @@ class RestaurantSeeder extends Seeder
                 'avg_rating' => 4.6,
                 'avg_price' => 180000,
                 'image_url' => 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
-                'categories' => ['Japanese', 'Sapi', 'All You Can Eat', 'Luxury ($$$$)', 'Dinner']
+                'categories' => ['Japanese', 'Sapi', 'All You Can Eat', 'Dinner']
             ],
             [
                 'name' => 'Holycow Steak',
@@ -114,9 +107,18 @@ class RestaurantSeeder extends Seeder
                 'location' => 'Alam Sutera',
                 'description' => 'Restoran BBQ Jepang dengan pilihan daging wagyu.',
                 'avg_rating' => 4.7,
-                'avg_price' => 160000,
+                'avg_price' => 290000,
                 'image_url' => 'https://images.unsplash.com/photo-1740895299299-fe11f57507dc?q=80&w=1170&auto=format&fit=crop&w=600&q=80',
-                'categories' => ['Japanese', 'Sapi', 'Luxury ($$$$)', 'Dinner']
+                'categories' => ['Japanese', 'Sapi', 'Dinner']
+            ],
+            [
+                'name' => 'Hachi Grill',
+                'location' => 'Alam Sutera',
+                'description' => 'Restoran BBQ Jepang all you can eat.',
+                'avg_rating' => 4.7,
+                'avg_price' => 300000,
+                'image_url' => 'https://images.unsplash.com/photo-1494566942107-a6e23c42d69e?q=80&w=1171&auto=format&fit=crop&w=600&q=80',
+                'categories' => ['Japanese', 'Sapi', 'Dinner']
             ],
             [
                 'name' => 'Bakso Boedjangan',
@@ -161,7 +163,7 @@ class RestaurantSeeder extends Seeder
                 'avg_rating' => 4.0,
                 'avg_price' => 30000,
                 'image_url' => 'https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=600&q=80',
-                'categories' => ['Western', 'Steak', 'Affordable ($$)', 'Dinner']
+                'categories' => ['Western', 'Steak', 'Dinner']
             ],
             [
                 'name' => 'Upnormal Coffee Roasters',
@@ -186,7 +188,7 @@ class RestaurantSeeder extends Seeder
                 'location' => 'Supermall Karawaci',
                 'description' => 'Suki dan grill dengan harga terjangkau.',
                 'avg_rating' => 4.4,
-                'avg_price' => 70000,
+                'avg_price' => 100000,
                 'image_url' => 'https://images.unsplash.com/photo-1663559147132-8138438ef2a9?q=80&w=1170&auto=format&fit=crop&w=600&q=80',
                 'categories' => ['Thai', 'Soup', 'Sayuran (Vegan)', 'Dinner']
             ],
@@ -237,7 +239,6 @@ class RestaurantSeeder extends Seeder
             ]
         ];
 
-
         foreach ($restaurants as $item) {
             $newResto = Restaurant::create([
                 'name' => $item['name'],
@@ -247,21 +248,28 @@ class RestaurantSeeder extends Seeder
                 'avg_rating' => $item['avg_rating'],
                 'avg_price' => $item['avg_price'],
                 'image_url' => $item['image_url'],
+                'total_reviews' => rand(10, 100),
+                'hot_score' => rand(0, 100),
                 'approved' => true,
             ]);
 
+            $categoriesToAttach = $item['categories'];
+
             $priceCategoryName = '';
-            if ($item['avg_price'] < 30000) $priceCategoryName = 'Cheap ($)';
-            elseif ($item['avg_price'] < 50000) $priceCategoryName = 'Affordable ($$)';
-            elseif ($item['avg_price'] < 100000) $priceCategoryName = 'Pricy ($$$)';
-            else $priceCategoryName = 'Luxury ($$$$)';
-
-            if (!in_array($priceCategoryName, $item['categories'])) {
-                $item['categories'][] = $priceCategoryName;
+            if ($item['avg_price'] < 30000) {
+                $priceCategoryName = 'Cheap ($)';
+            } elseif ($item['avg_price'] < 50000) {
+                $priceCategoryName = 'Affordable ($$)';
+            } elseif ($item['avg_price'] < 100000) {
+                $priceCategoryName = 'Pricy ($$$)';
+            } elseif ($item['avg_price'] < 250000) {
+                $priceCategoryName = 'Premium ($$$$)';
+            } else {
+                $priceCategoryName = 'Luxury ($$$$$)';
             }
+            $categoriesToAttach[] = $priceCategoryName;
 
-            $categoryIds = Category::whereIn('name', $item['categories'])->pluck('id');
-
+            $categoryIds = Category::whereIn('name', $categoriesToAttach)->pluck('id');
             $newResto->categories()->attach($categoryIds);
         }
     }

@@ -21,7 +21,8 @@ class CategorySeeder extends Seeder
                 'Cheap ($)',
                 'Affordable ($$)',
                 'Pricy ($$$)',
-                'Luxury ($$$$)'
+                'Premium ($$$$)',
+                'Luxury ($$$$$)'
             ],
 
             // Asal Negara (Cuisine)

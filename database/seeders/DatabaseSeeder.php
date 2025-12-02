@@ -2,7 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Restaurant;
 use App\Models\User;
+use Database\Factories\RestaurantFactory;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
