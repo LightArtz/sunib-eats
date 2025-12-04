@@ -29,7 +29,7 @@ class ProfileUpdateRequest extends FormRequest
             'date_of_birth' => ['required', 'date'],
             'gender' => ['nullable', 'string', 'in:male,female,other'],
             'bio' => ['nullable', 'string', 'max:1000'],
-            'profile_picture' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'profile_picture' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:10240'],
         ];
     }
 }

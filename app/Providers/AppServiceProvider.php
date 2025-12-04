@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Blade::anonymousComponentNamespace('breeze.components', 'breeze');
+        Blade::anonymousComponentPath(resource_path('views/breeze/components'));
         Paginator::useBootstrapFive();
     }
 }

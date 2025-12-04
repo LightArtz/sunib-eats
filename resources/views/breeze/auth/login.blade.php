@@ -1,47 +1,56 @@
 <x-guest-layout>
-    <!-- Session Status -->
-    <x-breeze::auth-session-status class="mb-4" :status="session('status')" />
+    <div class="text-center mb-4">
+        <h4 class="fw-bold">Selamat Datang!</h4>
+        <p class="text-muted small">Silakan login untuk melanjutkan perburuan kuliner.</p>
+    </div>
+
+    <x-breeze::auth-session-status class="alert alert-success mb-3" :status="session('status')" />
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-breeze::input-label for="email" :value="__('Email')" />
-            <x-breeze::text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-breeze::input-error :messages="$errors->get('email')" class="mt-2" />
+        <div class="form-floating mb-3">
+            <input type="email" class="form-control @error('email') is-invalid @enderror"
+                id="email" name="email" placeholder="name@example.com"
+                value="{{ old('email') }}" required autofocus autocomplete="username">
+            <label for="email">Email Address</label>
+            @error('email')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-breeze::input-label for="password" :value="__('Password')" />
-
-            <x-breeze::text-input id="password" class="block mt-1 w-full"
-                type="password"
-                name="password"
-                required autocomplete="current-password" />
-
-            <x-breeze::input-error :messages="$errors->get('password')" class="mt-2" />
+        <div class="form-floating mb-3">
+            <input type="password" class="form-control @error('password') is-invalid @enderror"
+                id="password" name="password" placeholder="Password"
+                required autocomplete="current-password">
+            <label for="password">Password</label>
+            @error('password')
+            <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-        </div>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check">
+                <input id="remember_me" type="checkbox" class="form-check-input" name="remember">
+                <label for="remember_me" class="form-check-label small text-muted">Ingat Saya</label>
+            </div>
 
-        <div class="flex items-center justify-end mt-4">
             @if (Route::has('password.request'))
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('password.request') }}">
-                {{ __('Forgot your password?') }}
+            <a class="small text-decoration-none fw-bold" href="{{ route('password.request') }}">
+                Lupa Password?
             </a>
             @endif
+        </div>
 
-            <x-breeze::primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-breeze::primary-button>
+        <div class="d-grid gap-2">
+            <button type="submit" class="btn btn-primary btn-lg fw-bold">
+                Masuk Sekarang
+            </button>
+        </div>
+
+        <div class="text-center mt-4">
+            <p class="small text-muted mb-0">Belum punya akun?</p>
+            <a href="{{ route('register') }}" class="fw-bold text-decoration-none">Daftar Akun Baru</a>
         </div>
     </form>
 </x-guest-layout>
