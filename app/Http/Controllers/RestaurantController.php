@@ -49,4 +49,24 @@ class RestaurantController extends Controller
 
         return view('components.restaurant-detail', compact('restaurant'));
     }
+
+    public function explore(Request $request)
+    {
+        $categories = Category::where('type', '!=', 'price_range')
+            ->get()
+            ->groupBy('type');
+
+        $restaurants = Restaurant::query()
+            ->search($request->input('search'))
+            ->filterPrice($request->input('price'))
+            ->filterByCategories($request->input('categories'))
+            ->sortBy($request->input('sort'))
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('pages.explore', [
+            'restaurants' => $restaurants,
+            'categories' => $categories
+        ]);
+    }
 }

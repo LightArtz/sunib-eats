@@ -27,7 +27,9 @@
                 <li class="nav-item me-2">
                     <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Home</a>
                 </li>
-
+                <li class="nav-item me-2">
+                    <a class="nav-link {{ request()->routeIs('explore') ? 'active' : '' }}" href="{{ route('explore') }}">Jelajahi</a>
+                </li>
                 @auth
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active fw-bold" href="#" role="button" data-bs-toggle="dropdown">

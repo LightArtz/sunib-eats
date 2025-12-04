@@ -44,105 +44,8 @@
 
 
     <div class="row">
-
         <div class="col-lg-3 mb-4">
-            <div class="card shadow-sm border-0 sticky-top" style="top: 20px; z-index: 1;">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-4"><i class="bi bi-funnel-fill text-primary"></i> Filter</h5>
-
-                    <form action="{{ route('home') }}" method="GET">
-                        @if(request('search'))
-                        <input type="hidden" name="search" value="{{ request('search') }}">
-                        @endif
-
-                        <div class="mb-4">
-                            <h6 class="fw-bold text-uppercase text-muted small mb-3">Harga</h6>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="price" value="1"
-                                    {{ request('price') == '1' ? 'checked' : '' }}>
-                                <label class="form-check-label small">Cheap ($)</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="price" value="2"
-                                    {{ request('price') == '2' ? 'checked' : '' }}>
-                                <label class="form-check-label small">Affordable ($$)</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="price" value="3"
-                                    {{ request('price') == '3' ? 'checked' : '' }}>
-                                <label class="form-check-label small">Pricy ($$$)</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="price" value="4"
-                                    {{ request('price') == '4' ? 'checked' : '' }}>
-                                <label class="form-check-label small">Premium ($$$$)</label>
-                            </div>
-
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="price" value="5"
-                                    {{ request('price') == '5' ? 'checked' : '' }}>
-                                <label class="form-check-label small">Luxury ($$$$$)</label>
-                            </div>
-                        </div>
-
-                        @if(isset($categories))
-                        @foreach($categories as $type => $catList)
-                        <div class="mb-4">
-                            <h6 class="fw-bold text-uppercase text-muted small mb-3">
-                                {{ str_replace('_', ' ', $type) }}
-                            </h6>
-                            <div class="row g-2">
-                                @foreach($catList as $cat)
-                                <div class="col-6">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox"
-                                            name="categories[]"
-                                            value="{{ $cat->id }}"
-                                            id="cat-{{ $cat->id }}"
-                                            {{ in_array($cat->id, request('categories', [])) ? 'checked' : '' }}>
-                                        <label class="form-check-label text-dark small text-truncate d-block" for="cat-{{ $cat->id }}" title="{{ ucwords($cat->name) }}">
-                                            {{ ucwords($cat->name) }}
-                                        </label>
-                                    </div>
-                                </div>
-                                @endforeach
-                            </div>
-                        </div>
-                        <hr class="text-muted opacity-25">
-                        @endforeach
-                        @endif
-
-                        <div class="mb-4">
-                            <h6 class="fw-bold text-uppercase text-muted small mb-3">Urutkan</h6>
-                            <div class="d-flex flex-column gap-2">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="sort" id="sortNew" value="newest" {{ request('sort') == 'newest' ? 'checked' : '' }}>
-                                    <label class="form-check-label small" for="sortNew">Paling Baru</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="sort" id="sortRating" value="rating_desc" {{ request('sort') == 'rating_desc' ? 'checked' : '' }}>
-                                    <label class="form-check-label small" for="sortRating">Rating Tertinggi</label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="sort" id="sortCheap" value="price_asc" {{ request('sort') == 'price_asc' ? 'checked' : '' }}>
-                                    <label class="form-check-label small" for="sortCheap">Harga Terendah</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-primary btn-sm fw-bold">Terapkan</button>
-                            @if(request()->hasAny(['search', 'sort', 'categories']))
-                            <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
-                            @endif
-                        </div>
-                    </form>
-                </div>
-            </div>
+            <x-restaurant-filter :categories="$categories" />
         </div>
 
         <div class="col-lg-9">
@@ -208,7 +111,6 @@
                 @endforeach
             </div>
 
-            {{-- Pesan jika tidak ada hasil --}}
             @if($restaurants->count() == 0)
             <div class="text-center py-5">
                 <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="Empty" style="width: 100px; opacity: 0.5;">
