@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Restaurant;
 use App\Models\Review;
+use App\Models\ReviewImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -16,6 +17,11 @@ class ReviewController extends Controller
             'rating' => 'required|integer|min:1|max:5',
             'content' => 'required|string|max:500',
             'price_per_portion' => 'required|numeric|min:1000',
+            'images' => ['nullable', 'array', 'max:3'],
+            'images.*' => ['image', 'mimes:jpg,jpeg,png', 'max:2048'],
+        ], [
+            'images.max' => 'Maksimal hanya boleh mengupload 3 foto.',
+            'images.*.max' => 'Ukuran setiap foto tidak boleh lebih dari 2MB.'
         ]);
 
         $existingReview = Review::where('user_id', Auth::id())
@@ -35,10 +41,20 @@ class ReviewController extends Controller
                 'price_per_portion' => $validated['price_per_portion'],
             ]);
 
+            if ($request->hasFile('images')) {
+                foreach ($request->file('images') as $photo) {
+                    $path = $photo->store('reviews', 'public');
+                    ReviewImage::create([
+                        'review_id' => $review->id,
+                        'path' => $path
+                    ]);
+                }
+            }
+
             $this->recalculateRestaurantStats($restaurant);
         });
 
-        return back()->with('success', 'Ulasan berhasil ditambahkan!');
+        return back()->with('success', 'Ulasan dan foto berhasil ditambahkan!');
     }
 
     public function update(Request $request, Review $review)

@@ -43,9 +43,17 @@ class RestaurantController extends Controller
 
     public function show(Restaurant $restaurant)
     {
-        $restaurant->load(['promotions' => function ($query) {
-            $query->active();
-        }, 'reviews.user']);
+        $restaurant->load([
+            'promotions' => function ($query) {
+                $query->active();
+            },
+            'reviews' => function ($query) {
+                $query->with(['user', 'images'])
+                    ->withSum('votes', 'vote_value')
+                    ->orderByDesc('votes_sum_vote_value')
+                    ->latest();
+            }
+        ]);
 
         return view('components.restaurant-detail', compact('restaurant'));
     }

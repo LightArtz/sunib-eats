@@ -4,7 +4,7 @@
         <p class="text-muted small">Silakan login untuk melanjutkan perburuan kuliner.</p>
     </div>
 
-    <x-breeze::auth-session-status class="alert alert-success mb-3" :status="session('status')" />
+    <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
@@ -14,9 +14,7 @@
                 id="email" name="email" placeholder="name@example.com"
                 value="{{ old('email') }}" required autofocus autocomplete="username">
             <label for="email">Email Address</label>
-            @error('email')
-            <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+            <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
         <div class="form-floating mb-3">
@@ -24,9 +22,7 @@
                 id="password" name="password" placeholder="Password"
                 required autocomplete="current-password">
             <label for="password">Password</label>
-            @error('password')
-            <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+            <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4">

@@ -32,7 +32,6 @@
     </div>
 
     <div class="row g-4">
-
         <div class="col-lg-8">
 
             <div class="card shadow-sm mb-4 border-0">
@@ -65,65 +64,26 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                    <h4 class="fw-bold mb-0">💬 Ulasan Pengunjung</h4>
-                    <span class="badge bg-primary rounded-pill">{{ $restaurant->reviews->count() }} Komentar</span>
-                </div>
-
-                <div class="card-body p-4">
-                    @forelse($restaurant->reviews as $review)
-                    <div class="d-flex mb-4 border-bottom pb-3">
-                        <div class="flex-shrink-0">
-                            <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
-                                {{ substr($review->user->name, 0, 1) }}
-                            </div>
-                        </div>
-
-                        <div class="flex-grow-1 ms-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <h6 class="fw-bold mb-0">{{ $review->user->name }}</h6>
-                                <small class="text-muted">{{ $review->created_at->diffForHumans() }}</small>
-                            </div>
-
-                            <div class="text-warning small mb-2">
-                                @for($i = 1; $i <= 5; $i++)
-                                    {{ $i <= $review->rating ? '★' : '☆' }}
-                                    @endfor
-                                    @if($review->price_per_portion)
-                                    <span class="text-muted small ms-2">
-                                        • <strong>Rp {{ number_format($review->price_per_portion, 0, ',', '.') }}</strong>
-                                    </span>
-                                    @endif
-                            </div>
-
-                            <p class="mb-0 text-dark">{{ $review->content }}</p>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="text-center py-4 text-muted">
-                        <p>Belum ada ulasan. Jadilah yang pertama mereview restoran ini!</p>
-                    </div>
-                    @endforelse
-                </div>
-            </div>
+            <x-restaurant-reviews :restaurant="$restaurant" />
 
         </div>
+
         <div class="col-lg-4">
 
             <div class="card shadow-sm border-0 sticky-top" style="top: 20px; z-index: 1;">
                 <div class="card-body p-4">
                     <h5 class="fw-bold mb-3">Tulis Ulasan</h5>
+
                     @if(session('error'))
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         {{ session('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                     @endif
 
                     @if ($errors->any())
                     <div class="alert alert-danger">
-                        <ul class="mb-0 small">
+                        <ul class="mb-0 small ps-3">
                             @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                             @endforeach
@@ -132,7 +92,7 @@
                     @endif
 
                     @auth
-                    <form action="{{ route('reviews.store', $restaurant) }}" method="POST">
+                    <form action="{{ route('reviews.store', $restaurant) }}" method="POST" enctype="multipart/form-data">
                         @csrf
 
                         <div class="mb-3">
@@ -145,15 +105,17 @@
                                 <option value="1">⭐ (1 - Buruk)</option>
                             </select>
                         </div>
+
                         <div class="mb-3">
-                            <label class="form-label small text-muted">Harga Per Porsi</label>
+                            <label class="form-label small text-muted">Estimasi Harga per Orang</label>
                             <div class="input-group">
-                                <span class="input-group-text">Rp</span>
+                                <span class="input-group-text bg-light text-muted">Rp</span>
                                 <input type="number"
                                     name="price_per_portion"
                                     class="form-control"
                                     value="{{ old('price_per_portion') }}"
                                     placeholder="Contoh: 25000"
+                                    min="1000"
                                     required>
                             </div>
                             @error('price_per_portion')
@@ -163,15 +125,39 @@
 
                         <div class="mb-3">
                             <label class="form-label small text-muted">Pengalaman Anda</label>
-                            <textarea name="content" rows="3" class="form-control" placeholder="Makanannya enak, tempatnya nyaman..." required></textarea>
+                            <textarea name="content" rows="3" class="form-control" placeholder="Ceritakan pengalaman makannya..." required>{{ old('content') }}</textarea>
                         </div>
 
-                        <button type="submit" class="btn btn-primary w-100">Kirim Ulasan</button>
+                        <div class="mb-3">
+                            <label class="form-label small text-muted">Foto Makanan (Maks 3)</label>
+
+                            <div class="d-flex gap-2 flex-wrap" id="image-upload-container">
+                                <div class="upload-box" id="add-image-btn">
+                                    <i class="bi bi-plus-lg text-secondary fs-4"></i>
+                                </div>
+                            </div>
+
+                            <input type="file"
+                                id="final-upload-input"
+                                name="images[]"
+                                class="d-none"
+                                multiple>
+
+                            <input type="file"
+                                id="file-selector"
+                                accept="image/*"
+                                multiple
+                                class="d-none">
+
+                            <div class="form-text small text-muted mt-2">Format: JPG, PNG. Maks 2MB/foto.</div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Kirim Ulasan</button>
                     </form>
                     @else
-                    <div class="text-center py-3">
-                        <p class="small text-muted mb-3">Silakan login untuk menulis ulasan.</p>
-                        <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm w-100">Masuk / Daftar</a>
+                    <div class="text-center py-4 bg-light rounded">
+                        <p class="small text-muted mb-3">Login untuk mulai mereview!</p>
+                        <a href="{{ route('login') }}" class="btn btn-outline-primary btn-sm px-4 fw-bold">Masuk / Daftar</a>
                     </div>
                     @endauth
                 </div>
@@ -179,11 +165,15 @@
 
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-body">
-                    <h6 class="fw-bold">Jam Operasional</h6>
-                    <p class="small text-muted mb-0">Setiap Hari: 10:00 - 22:00 WIB</p>
-                    <hr>
-                    <h6 class="fw-bold">Kisaran Harga</h6>
-                    <p class="small text-muted mb-0">Rp {{ number_format($restaurant->avg_price, 0, ',', '.') }} / orang</p>
+                    <h6 class="fw-bold">Info Tambahan</h6>
+                    <div class="d-flex justify-content-between align-items-center mb-2 mt-3">
+                        <span class="small text-muted">Jam Buka</span>
+                        <span class="small fw-bold">10:00 - 22:00</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="small text-muted">Avg. Harga</span>
+                        <span class="small fw-bold">Rp {{ number_format($restaurant->avg_price, 0, ',', '.') }}</span>
+                    </div>
                 </div>
             </div>
 

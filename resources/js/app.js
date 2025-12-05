@@ -1,4 +1,6 @@
 import './bootstrap';
+import './vote';
+import './image-upload';
 
 import Alpine from 'alpinejs';
 

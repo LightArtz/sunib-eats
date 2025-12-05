@@ -5,15 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Auth;
 
 class Review extends Model
 {
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'user_id', 'restaurant_id', 'content', 'rating',
-        'price_per_portion', 'price_symbol_count',
-        'edited_at', 'edit_history'
+        'user_id',
+        'restaurant_id',
+        'content',
+        'rating',
+        'price_per_portion',
+        'price_symbol_count',
+        'edited_at',
+        'edit_history'
     ];
 
     protected $casts = [
@@ -44,5 +50,15 @@ class Review extends Model
     public function votes()
     {
         return $this->hasMany(Vote::class);
+    }
+
+    public function getScoreAttribute()
+    {
+        return $this->votes->sum('vote_value');
+    }
+    public function getCurrentUserVoteAttribute()
+    {
+        if (!Auth::check()) return 0;
+        return $this->votes->where('user_id', Auth::id())->value('vote_value') ?? 0;
     }
 }
