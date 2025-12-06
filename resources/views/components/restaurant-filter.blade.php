@@ -5,12 +5,10 @@
         <h5 class="fw-bold mb-4"><i class="bi bi-funnel-fill text-primary"></i> Filter</h5>
 
         <form action="{{ $action }}" method="GET">
-            {{-- Pertahankan query search jika ada, agar tidak hilang saat filter --}}
             @if(request('search'))
             <input type="hidden" name="search" value="{{ request('search') }}">
             @endif
 
-            {{-- Filter Harga --}}
             <div class="mb-4">
                 <h6 class="fw-bold text-uppercase text-muted small mb-3">Harga</h6>
 
@@ -34,7 +32,6 @@
                 @endforeach
             </div>
 
-            {{-- Filter Kategori --}}
             @if(isset($categories))
             @foreach($categories as $type => $catList)
             <div class="mb-4">
@@ -62,7 +59,6 @@
             @endforeach
             @endif
 
-            {{-- Filter Sorting --}}
             <div class="mb-4">
                 <h6 class="fw-bold text-uppercase text-muted small mb-3">Urutkan</h6>
                 <div class="d-flex flex-column gap-2">
@@ -81,7 +77,6 @@
                 </div>
             </div>
 
-            {{-- Tombol Action --}}
             <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary btn-sm fw-bold">Terapkan</button>
                 @if(request()->hasAny(['search', 'sort', 'categories', 'price']))

@@ -41,17 +41,26 @@ class RestaurantController extends Controller
         ]);
     }
 
-    public function show(Restaurant $restaurant)
+    public function show(Restaurant $restaurant, Request $request)
     {
+        $sort = $request->query('sort', 'popular');
+
         $restaurant->load([
             'promotions' => function ($query) {
                 $query->active();
             },
-            'reviews' => function ($query) {
+            'reviews' => function ($query) use ($sort) {
                 $query->with(['user', 'images'])
-                    ->withSum('votes', 'vote_value')
-                    ->orderByDesc('votes_sum_vote_value')
-                    ->latest();
+                    ->withSum('votes', 'vote_value');
+
+                if ($sort === 'recent') {
+                    $query->latest();
+                } elseif ($sort === 'oldest') {
+                    $query->oldest();
+                } else {
+                    $query->orderByDesc('votes_sum_vote_value')
+                        ->latest();
+                }
             }
         ]);
 
