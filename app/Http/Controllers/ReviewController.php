@@ -8,6 +8,7 @@ use App\Models\ReviewImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ReviewController extends Controller
 {
@@ -24,24 +25,47 @@ class ReviewController extends Controller
             'images.*.max' => 'Ukuran setiap foto tidak boleh lebih dari 2MB.'
         ]);
 
-        $existingReview = Review::where('user_id', Auth::id())
+        $existingReview = Review::withTrashed()
+            ->where('user_id', Auth::id())
             ->where('restaurant_id', $restaurant->id)
             ->first();
 
-        if ($existingReview) {
-            return back()->with('error', 'Anda sudah mereview tempat ini.');
+        if ($existingReview && !$existingReview->trashed()) {
+            return back()->with('error', 'Anda sudah mereview tempat ini. Silakan edit ulasan lama Anda melalui halaman Riwayat Ulasan.');
         }
 
-        DB::transaction(function () use ($request, $restaurant, $validated) {
-            $review = Review::create([
-                'user_id' => Auth::id(),
-                'restaurant_id' => $restaurant->id,
-                'rating' => $validated['rating'],
-                'content' => $validated['content'],
-                'price_per_portion' => $validated['price_per_portion'],
-            ]);
+        $isRestored = false;
 
-            if ($request->hasFile('images')) {
+        DB::transaction(function () use ($request, $restaurant, $validated, $existingReview, &$isRestored) {
+
+            if ($existingReview) {
+                if ($existingReview->trashed()) {
+                    $existingReview->restore();
+
+                    $existingReview->update([
+                        'rating' => $validated['rating'],
+                        'content' => $validated['content'],
+                        'price_per_portion' => $validated['price_per_portion'],
+                        'created_at' => now(),
+                    ]);
+
+                    foreach ($existingReview->images as $oldImage) {
+                        $oldImage->delete();
+                    }
+                    $review = $existingReview;
+                    $isRestored = true;
+                }
+            } else {
+                $review = Review::create([
+                    'user_id' => Auth::id(),
+                    'restaurant_id' => $restaurant->id,
+                    'rating' => $validated['rating'],
+                    'content' => $validated['content'],
+                    'price_per_portion' => $validated['price_per_portion'],
+                ]);
+            }
+
+            if (isset($review) && $request->hasFile('images')) {
                 foreach ($request->file('images') as $photo) {
                     $path = $photo->store('reviews', 'public');
                     ReviewImage::create([
@@ -54,6 +78,10 @@ class ReviewController extends Controller
             $this->recalculateRestaurantStats($restaurant);
         });
 
+        if ($isRestored) {
+            return back()->with('success', 'Ulasan lama Anda berhasil diperbarui!');
+        }
+
         return back()->with('success', 'Ulasan dan foto berhasil ditambahkan!');
     }
 
@@ -61,9 +89,26 @@ class ReviewController extends Controller
     {
         if ($review->user_id !== Auth::id()) abort(403);
 
+        $countExisting = $review->images()->count();
+
+        $deleteImageIds = $request->input('deleted_images', []);
+        $countToDelete = is_array($deleteImageIds) ? count(array_filter($deleteImageIds)) : 0;
+
+        $countNew = $request->hasFile('new_images') ? count($request->file('new_images')) : 0;
+
+        $finalImageCount = ($countExisting - $countToDelete) + $countNew;
+
+        if ($finalImageCount > 3) {
+            return back()->with('error', 'Total foto tidak boleh lebih dari 3. Silakan hapus beberapa foto lama sebelum menambah yang baru.');
+        }
+
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'content' => 'required|string',
+            'new_images' => ['nullable', 'array'],
+            'new_images.*' => ['image', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'deleted_images' => ['nullable', 'array'],
+            'deleted_images.*' => ['integer', 'exists:review_images,id'],
         ]);
 
         DB::transaction(function () use ($request, $review, $validated) {
@@ -81,10 +126,32 @@ class ReviewController extends Controller
                 'edit_history' => $history
             ]);
 
+            $deleteIds = $request->input('deleted_images', []);
+            if (is_array($deleteIds) && count($deleteIds) > 0) {
+                $imagesToDelete = $review->images()->whereIn('id', $deleteIds)->get();
+
+                foreach ($imagesToDelete as $img) {
+                    if (Storage::disk('public')->exists($img->path)) {
+                        Storage::disk('public')->delete($img->path);
+                    }
+                    $img->delete();
+                }
+            }
+
+            if ($request->hasFile('new_images')) {
+                foreach ($request->file('new_images') as $photo) {
+                    $path = $photo->store('reviews', 'public');
+                    ReviewImage::create([
+                        'review_id' => $review->id,
+                        'path' => $path
+                    ]);
+                }
+            }
+
             $this->recalculateRestaurantStats($review->restaurant);
         });
 
-        return back()->with('success', 'Ulasan berhasil diedit.');
+        return redirect()->route('history')->with('success', 'Ulasan berhasil diperbarui.');
     }
 
     private function recalculateRestaurantStats(Restaurant $restaurant)
@@ -100,10 +167,35 @@ class ReviewController extends Controller
         ]);
     }
 
-    /**
-     * @param  \App\Models\Review  
-     * @return \Illuminate\Http\RedirectResponse
-     */
+    public function community()
+    {
+        $reviews = Review::with(['user', 'restaurant', 'images'])
+            ->withSum('votes', 'vote_value')
+            ->latest()
+            ->paginate(10);
+
+        return view('pages.community', compact('reviews'));
+    }
+
+    public function history()
+    {
+        $reviews = Review::with(['restaurant', 'images'])
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->paginate(10);
+
+        return view('pages.history', compact('reviews'));
+    }
+
+    public function edit(Review $review)
+    {
+        if ($review->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return view('pages.reviews.edit', compact('review'));
+    }
+
     public function destroy(Review $review)
     {
         if ($review->user_id !== Auth::id()) {

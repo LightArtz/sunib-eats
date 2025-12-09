@@ -30,6 +30,9 @@
                 <li class="nav-item me-2">
                     <a class="nav-link {{ request()->routeIs('explore') ? 'active' : '' }}" href="{{ route('explore') }}">Jelajahi</a>
                 </li>
+                <li class="nav-item me-2">
+                    <a class="nav-link {{ request()->routeIs('community') ? 'active' : '' }}" href="{{ route('community') }}">Komunitas</a>
+                </li>
                 @auth
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle active fw-bold" href="#" role="button" data-bs-toggle="dropdown">
@@ -37,6 +40,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end shadow">
                         <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
+                        <li><a class="dropdown-item" href="{{ route('history') }}">Riwayat Ulasan</a></li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
