@@ -1,9 +1,11 @@
 <div class="card mb-3 shadow-sm overflow-hidden">
   <div class="row g-0 align-items-center"> <div class="col-md-4">
-      <img src="{{ $restaurant->image_url }}" 
-           alt="{{ $restaurant->name }}" 
-           class="img-fluid rounded-start" 
-           style="width: 100%; aspect-ratio: 16/9; object-fit: cover;">
+      <img 
+          src="{{ Str::startsWith($restaurant->image_url, 'http') ? $restaurant->image_url : Storage::url($restaurant->image_url) }}" 
+          class="card-img-top" 
+          alt="{{ $restaurant->name }}"
+          style="height: 200px; object-fit: cover;"
+      >
     </div>
     
     <div class="col-md-8">
