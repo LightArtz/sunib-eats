@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sunib Eats - Admin Dashboard</title>
+    <link rel="icon" href="/logo.png" type="image/png">
     <script defer src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <style>
@@ -188,11 +189,11 @@
                             x-transition
                         >
                             <!-- Profile Option -->
-                            <a href="#" class="block px-4 py-2 text-sm text-slate-900 hover:bg-slate-50 rounded-t-lg transition-colors border-b border-slate-200">
+                            <a href="/profile" class="block px-4 py-2 text-sm text-slate-900 hover:bg-slate-50 rounded-t-lg transition-colors border-b border-slate-200">
                                 Profile Settings
                             </a>
                             <!-- Password Option -->
-                            <a href="#" class="block px-4 py-2 text-sm text-slate-900 hover:bg-slate-50 transition-colors border-b border-slate-200">
+                            <a href="/profile" class="block px-4 py-2 text-sm text-slate-900 hover:bg-slate-50 transition-colors border-b border-slate-200">
                                 Change Password
                             </a>
                             <!-- Logout Option -->
