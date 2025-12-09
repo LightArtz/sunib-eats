@@ -75,7 +75,7 @@
     </div>
 
     <!-- Recent Activity Section -->
-    <div class="bg-white rounded-lg border border-slate-200 p-6 shadow-sm mb-8">
+    <div class="bg-white rounded-lg border border-slate-200 p-6 shadow-sm mb-8" x-data="{ showDeleteModal: false, deleteUrl: '' }">
     <div class="flex items-center justify-between mb-6">
         <h2 class="text-lg font-semibold text-slate-900">Recent Reviews</h2>
         <a href="/admin/reviews" class="text-indigo-600 hover:text-indigo-700 text-sm font-medium">View All</a>
@@ -115,13 +115,12 @@
                     </td>
                     
                     <td class="px-4 py-3">
-                        <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST" onsubmit="return confirm('Hapus review ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:text-red-900 text-xs font-medium">
-                                Delete
-                            </button>
-                        </form>
+                        <button 
+                            @click="showDeleteModal = true; deleteUrl = '{{ route('admin.reviews.destroy', $review) }}'"
+                            class="text-red-600 hover:text-red-900 text-xs font-medium"
+                        >
+                            Delete
+                        </button>
                     </td>
                 </tr>
             @empty
@@ -133,6 +132,34 @@
             @endforelse
         </tbody>
         </table>
+    </div>
+    <div 
+        x-show="showDeleteModal" 
+        @click.self="showDeleteModal = false"
+        class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        style="display: none;"
+        x-transition
+    >
+        <div class="bg-white rounded-lg shadow-lg p-6 max-w-sm w-full mx-4">
+            <h3 class="text-lg font-semibold text-slate-900 mb-2">Delete Review?</h3>
+            <p class="text-slate-600 text-sm mb-6">Are you sure you want to delete this review? This action cannot be undone.</p>
+            <div class="flex gap-3">
+                <button 
+                    @click="showDeleteModal = false"
+                    class="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 transition"
+                >
+                    Cancel
+                </button>
+                
+                <form :action="deleteUrl" method="POST" class="flex-1">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
+                        Delete
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
     </div>
 
