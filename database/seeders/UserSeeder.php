@@ -26,6 +26,18 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'name' => 'Admin',
+                'email' => 'admin@gmail.com',
+                'password' => Hash::make('password'),
+                'phone_number' => '081212346767',
+                'role' => 'admin',
+                'date_of_birth' => '2005-05-15',
+                'gender' => 'Male',
+                'bio' => 'Hobi makan',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ];
 
         DB::table('users')->insert($users);
