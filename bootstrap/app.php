@@ -12,6 +12,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(
+            trustProxies: true,
+            headers: Request::HEADER_X_FORWARDED_ALL
+        );
+        
         $middleware->alias([
             'admin' => IsAdmin::class,
         ]);
