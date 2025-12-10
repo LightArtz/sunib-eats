@@ -21,6 +21,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+
+        'role', // buat role user or admin
         
         // yang biasanya ditambahin
         'phone_number',

@@ -11,7 +11,11 @@
             @foreach ($promotions as $index => $promo)
             <div class="carousel-item {{ $index == 0 ? 'active' : '' }}">
                 <div class="position-relative" style="width: 100%; aspect-ratio: 16/9; max-height: 450px;">
-                    <img src="{{ $promo->image }}" class="d-block w-100 h-100" style="object-fit: cover; filter: brightness(0.5);" alt="{{ $promo->title }}">
+                    <img src="{{ Str::startsWith($promo->image, 'http') ? $promo->image : Storage::url($promo->image) }}" 
+                         class="d-block w-100 h-100" 
+                         style="object-fit: cover; filter: brightness(0.5);" 
+                         alt="{{ $promo->title }}">
+                    
                     <div class="carousel-caption d-none d-md-block text-start" style="bottom: 10%; left: 5%; right: 5%;">
                         <span class="badge bg-danger mb-2">PROMO SPESIAL</span>
                         <h2 class="fw-bold text-white">{{ $promo->title }}</h2>
@@ -72,7 +76,6 @@
                 <div>
                     @if(request()->hasAny(['search', 'categories', 'price', 'sort']))
                     <h3 class="fw-bold m-0">Hasil Pencarian</h3>
-
                     <div class="mt-1 small text-muted">
                         Menampilkan hasil untuk:
                         @if(request('search'))

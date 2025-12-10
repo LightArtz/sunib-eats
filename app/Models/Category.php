@@ -15,4 +15,9 @@ class Category extends Model
     {
         return $this->belongsToMany(Review::class, 'category_review');
     }
+
+    public function restaurants()
+    {
+        return $this->belongsToMany(Restaurant::class, 'category_restaurant');
+    }
 }

@@ -1,7 +1,7 @@
 <x-app-layout>
 
     <div class="position-relative rounded overflow-hidden shadow-sm mb-4" style="height: 350px;">
-        <img src="{{ $restaurant->image_url }}"
+        <img src="{{ Str::startsWith($restaurant->image_url, 'http') ? $restaurant->image_url : Storage::url($restaurant->image_url) }}"
             alt="{{ $restaurant->name }}"
             class="w-100 h-100"
             style="object-fit: cover; filter: brightness(0.4);">
