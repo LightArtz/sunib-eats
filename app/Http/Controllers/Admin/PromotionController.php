@@ -54,7 +54,7 @@ class PromotionController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('promotions', 'public');
+            $validated['image'] = $request->file('image')->store('promotions', 'cloudinary');
         }
 
         Promotion::create($validated);
@@ -97,7 +97,7 @@ class PromotionController extends Controller
             if ($promotion->image && Storage::disk('public')->exists($promotion->image)) {
                 Storage::disk('public')->delete($promotion->image);
             }
-            $validated['image'] = $request->file('image')->store('promotions', 'public');
+            $validated['image'] = $request->file('image')->store('promotions', 'cloudinary');
         }
 
         $promotion->update($validated);

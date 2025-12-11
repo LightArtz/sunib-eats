@@ -39,7 +39,7 @@ class ProfileController extends Controller
             }
 
             // 2. Simpan gambar baru dan dapatkan path-nya
-            $path = $request->file('profile_picture')->store('profile-pictures', 'public');
+            $path = $request->file('profile_picture')->store('profile-pictures', 'cloudinary');
 
             // 3. Tambahkan path gambar baru ke data yang akan disimpan
             $validatedData['profile_picture'] = $path;

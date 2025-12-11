@@ -55,7 +55,7 @@ class RestaurantController extends Controller
 
         // Handle Upload Gambar (Jika ada)
         if ($request->hasFile('image_url')) {
-            $path = $request->file('image_url')->store('restaurants', 'public');
+            $path = $request->file('image_url')->store('restaurants', 'cloudinary');
             $validated['image_url'] = $path;
         }
 
@@ -114,7 +114,7 @@ class RestaurantController extends Controller
             if ($restaurant->image_url && Storage::disk('public')->exists($restaurant->image_url)) {
                 Storage::disk('public')->delete($restaurant->image_url);
             }
-            $path = $request->file('image_url')->store('restaurants', 'public');
+            $path = $request->file('image_url')->store('restaurants', 'cloudinary');
             $validated['image_url'] = $path;
         }
 
@@ -136,8 +136,8 @@ class RestaurantController extends Controller
     public function destroy(Restaurant $restaurant)
     {
         // Hapus gambar dari storage saat data dihapus
-        if ($restaurant->image_url && Storage::disk('public')->exists($restaurant->image_url)) {
-            Storage::disk('public')->delete($restaurant->image_url);
+        if ($restaurant->image_url && Storage::disk('cloudinary')->exists($restaurant->image_url)) {
+            Storage::disk('cloudinary')->delete($restaurant->image_url);
         }
         
         $restaurant->delete();

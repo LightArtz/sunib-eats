@@ -67,7 +67,7 @@ class ReviewController extends Controller
 
             if (isset($review) && $request->hasFile('images')) {
                 foreach ($request->file('images') as $photo) {
-                    $path = $photo->store('reviews', 'public');
+                    $path = $photo->store('reviews', 'cloudinary');
                     ReviewImage::create([
                         'review_id' => $review->id,
                         'path' => $path
@@ -140,7 +140,7 @@ class ReviewController extends Controller
 
             if ($request->hasFile('new_images')) {
                 foreach ($request->file('new_images') as $photo) {
-                    $path = $photo->store('reviews', 'public');
+                    $path = $photo->store('reviews', 'cloudinary');
                     ReviewImage::create([
                         'review_id' => $review->id,
                         'path' => $path

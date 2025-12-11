@@ -113,7 +113,7 @@
         function restaurantEditForm() {
             return {
                 // Initialize Alpine data with existing server data
-                imagePreview: '{{ $restaurant->image_url ? Storage::url($restaurant->image_url) : "" }}',
+                imagePreview: '{{ $restaurant->image_url ? (Str::startsWith($restaurant->image_url, "http") ? $restaurant->image_url : Storage::url($restaurant->image_url)) : "" }}',
                 approved: {{ $restaurant->approved ? 'true' : 'false' }},
 
                 previewImage(event) {
