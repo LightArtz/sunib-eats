@@ -35,7 +35,7 @@ class ProfileController extends Controller
 
             // 1. Hapus gambar profil lama jika ada
             if ($user->profile_picture) {
-                Storage::delete('public/' . $user->profile_picture);
+                Storage::disk('cloudinary')->delete($user->profile_picture);
             }
 
             // 2. Simpan gambar baru dan dapatkan path-nya
@@ -71,7 +71,7 @@ class ProfileController extends Controller
         $user = $request->user();
 
         if ($user->profile_picture) {
-            Storage::delete('public/' . $user->profile_picture);
+            Storage::disk('cloudinary')->delete($user->profile_picture);
         }
 
         Auth::logout();

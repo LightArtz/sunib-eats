@@ -94,8 +94,8 @@ class PromotionController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($promotion->image && Storage::disk('public')->exists($promotion->image)) {
-                Storage::disk('public')->delete($promotion->image);
+            if ($promotion->image && Storage::disk('cloudinary')->exists($promotion->image)) {
+                Storage::disk('cloudinary')->delete($promotion->image);
             }
             $validated['image'] = $request->file('image')->store('promotions', 'cloudinary');
         }
@@ -110,8 +110,8 @@ class PromotionController extends Controller
      */
     public function destroy(Promotion $promotion)
     {
-        if ($promotion->image && Storage::disk('public')->exists($promotion->image)) {
-            Storage::disk('public')->delete($promotion->image);
+        if ($promotion->image && Storage::disk('cloudinary')->exists($promotion->image)) {
+            Storage::disk('cloudinary')->delete($promotion->image);
         }
         $promotion->delete();
         

@@ -111,8 +111,8 @@ class RestaurantController extends Controller
 
         // Handle Gambar Baru (Hapus yang lama jika ada)
         if ($request->hasFile('image_url')) {
-            if ($restaurant->image_url && Storage::disk('public')->exists($restaurant->image_url)) {
-                Storage::disk('public')->delete($restaurant->image_url);
+            if ($restaurant->image_url && Storage::disk('cloudinary')->exists($restaurant->image_url)) {
+                Storage::disk('cloudinary')->delete($restaurant->image_url);
             }
             $path = $request->file('image_url')->store('restaurants', 'cloudinary');
             $validated['image_url'] = $path;

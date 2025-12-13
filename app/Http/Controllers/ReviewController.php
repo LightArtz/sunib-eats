@@ -131,8 +131,8 @@ class ReviewController extends Controller
                 $imagesToDelete = $review->images()->whereIn('id', $deleteIds)->get();
 
                 foreach ($imagesToDelete as $img) {
-                    if (Storage::disk('public')->exists($img->path)) {
-                        Storage::disk('public')->delete($img->path);
+                    if (Storage::disk('cloudinary')->exists($img->path)) {
+                        Storage::disk('cloudinary')->delete($img->path);
                     }
                     $img->delete();
                 }
@@ -156,9 +156,9 @@ class ReviewController extends Controller
 
     private function recalculateRestaurantStats(Restaurant $restaurant)
     {
-        $avgRating = $restaurant->reviews()->avg('rating');
-        $avgPrice = $restaurant->reviews()->avg('price_per_portion');
-        $totalReviews = $restaurant->reviews()->count();
+        $avgRating = $restaurant->reviews()->whereNull('deleted_at')->avg('rating');
+        $avgPrice = $restaurant->reviews()->whereNull('deleted_at')->avg('price_per_portion');
+        $totalReviews = $restaurant->reviews()->whereNull('deleted_at')->count();
 
         $restaurant->update([
             'avg_rating' => $avgRating,

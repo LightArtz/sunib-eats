@@ -42,7 +42,9 @@
                         @if($review->images->count() > 0)
                         <div class="d-flex gap-2 mb-3 overflow-auto">
                             @foreach($review->images as $img)
-                            <img src="{{ asset('storage/' . $img->path) }}"
+                            <img src="{{ Str::startsWith($img->path, 'http') 
+                                            ? $img->path 
+                                            : Storage::url($img->path) }}"
                                 class="rounded border"
                                 style="width: 70px; height: 70px; object-fit: cover;">
                             @endforeach

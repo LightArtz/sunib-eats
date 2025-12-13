@@ -49,7 +49,12 @@
                                 <tr class="border-b border-slate-200 hover:bg-slate-50 transition">
                                     <td class="px-6 py-4">
                                         @if($user->profile_picture)
-                                            <img src="{{ Storage::url($user->profile_picture) }}" alt="Avatar" class="w-10 h-10 rounded-full object-cover">
+                                            <img 
+                                                  src="{{ Str::startsWith($user->profile_picture, 'http') 
+                                                        ? $user->profile_picture 
+                                                        : Storage::url($user->profile_picture) }}" 
+                                                alt="Avatar" 
+                                                class="w-10 h-10 rounded-full object-cover">
                                         @else
                                             <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random" alt="Avatar" class="w-10 h-10 rounded-full">
                                         @endif
