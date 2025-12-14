@@ -52,7 +52,7 @@
                                             <img 
                                                   src="{{ Str::startsWith($user->profile_picture, 'http') 
                                                         ? $user->profile_picture 
-                                                        : Storage::url($user->profile_picture) }}" 
+                                                        : Storage::disk('cloudinary')->url($user->profile_picture) }}"
                                                 alt="Avatar" 
                                                 class="w-10 h-10 rounded-full object-cover">
                                         @else

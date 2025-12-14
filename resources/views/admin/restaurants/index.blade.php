@@ -47,7 +47,7 @@
                             <td class="px-6 py-4">
                                 @if($restaurant->image_url)
                                     <img 
-                                        src="{{ Str::startsWith($restaurant->image_url, 'http') ? $restaurant->image_url : Storage::url($restaurant->image_url) }}" 
+                                        src="{{ Str::startsWith($restaurant->image_url, 'http') ? $restaurant->image_url : Storage::disk('cloudinary')->url($restaurant->image_url) }}"
                                         alt="{{ $restaurant->name }}" 
                                         class="w-12 h-12 rounded-lg object-cover"
                                     >

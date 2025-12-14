@@ -68,7 +68,7 @@
                             <div class="mb-4 w-full h-40 bg-slate-100 rounded-lg border-2 border-dashed border-slate-300 flex items-center justify-center overflow-hidden relative">
                                 @if($restaurant->image_url)
                                     <img 
-                                        src="{{ Str::startsWith($restaurant->image_url, 'http') ? $restaurant->image_url : Storage::url($restaurant->image_url) }}" 
+                                        src="{{ Str::startsWith($restaurant->image_url, 'http') ? $restaurant->image_url : Storage::disk('cloudinary')->url($restaurant->image_url) }}" 
                                         alt="{{ $restaurant->name }}" 
                                         class="w-25 h-25 rounded-lg object-cover"
                                     >
@@ -113,7 +113,7 @@
         function restaurantEditForm() {
             return {
                 // Initialize Alpine data with existing server data
-                imagePreview: '{{ $restaurant->image_url ? (Str::startsWith($restaurant->image_url, "http") ? $restaurant->image_url : Storage::url($restaurant->image_url)) : "" }}',
+                imagePreview: '{{ $restaurant->image_url ? (Str::startsWith($restaurant->image_url, "http") ? $restaurant->image_url : Storage::disk('cloudinary')->url($restaurant->image_url)) : "" }}',
                 approved: {{ $restaurant->approved ? 'true' : 'false' }},
 
                 previewImage(event) {

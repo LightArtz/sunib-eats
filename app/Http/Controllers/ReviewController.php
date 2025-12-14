@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Str;
 
 class ReviewController extends Controller
 {
@@ -67,10 +69,13 @@ class ReviewController extends Controller
 
             if (isset($review) && $request->hasFile('images')) {
                 foreach ($request->file('images') as $photo) {
-                    $path = $photo->store('reviews', 'cloudinary');
+                    // Use cloudinary() helper instead of Facade
+                    $result = cloudinary()->uploadApi()->upload($photo->getRealPath(), [
+                        'folder' => 'reviews'
+                    ]);
                     ReviewImage::create([
                         'review_id' => $review->id,
-                        'path' => $path
+                        'path' => $result['secure_url']
                     ]);
                 }
             }
@@ -131,8 +136,16 @@ class ReviewController extends Controller
                 $imagesToDelete = $review->images()->whereIn('id', $deleteIds)->get();
 
                 foreach ($imagesToDelete as $img) {
-                    if (Storage::disk('cloudinary')->exists($img->path)) {
-                        Storage::disk('cloudinary')->delete($img->path);
+                    // Check if it is a full URL (new data) or relative path (old data)
+                    if (Str::startsWith($img->path, 'http')) {
+                        // Extract Public ID from URL: 'reviews/filename'
+                        $publicId = 'reviews/' . pathinfo($img->path, PATHINFO_FILENAME);
+                        cloudinary()->uploadApi()->destroy($publicId);
+                    } else {
+                        // Fallback for old relative paths
+                        if (Storage::disk('cloudinary')->exists($img->path)) {
+                            Storage::disk('cloudinary')->delete($img->path);
+                        }
                     }
                     $img->delete();
                 }
@@ -140,14 +153,15 @@ class ReviewController extends Controller
 
             if ($request->hasFile('new_images')) {
                 foreach ($request->file('new_images') as $photo) {
-                    $path = $photo->store('reviews', 'cloudinary');
+                    $result = cloudinary()->uploadApi()->upload($photo->getRealPath(), [
+                        'folder' => 'reviews'
+                    ]);
                     ReviewImage::create([
                         'review_id' => $review->id,
-                        'path' => $path
+                        'path' => $result->getSecurePath()
                     ]);
                 }
             }
-
             $this->recalculateRestaurantStats($review->restaurant);
         });
 

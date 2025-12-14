@@ -3,7 +3,9 @@
 <div class="d-flex mb-4 border-bottom pb-3">
     <div class="flex-shrink-0 text-center" style="width: 60px;">
         @if($review->user->profile_picture)
-        <img src="{{ Str::startsWith($review->user->profile_picture, 'http') ? $review->user->profile_picture : Storage::url($review->user->profile_picture) }}" class="rounded-circle shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
+        <a href="{{ Str::startsWith($img->path, 'http') ? $img->path : Storage::url($img->path) }}" target="_blank">
+            <img src="{{ Str::startsWith($img->path, 'http') ? $img->path : Storage::url($img->path) }}" class="rounded-circle shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
+        </a>
         @else
         <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 50px; height: 50px; font-size: 1.2rem;">
             {{ substr($review->user->name, 0, 1) }}
@@ -52,8 +54,8 @@
                 @if($review->images->count() > 0)
                 <div class="d-flex gap-2 mt-2 overflow-auto pb-2">
                     @foreach($review->images as $img)
-                    <a href="{{ Str::startsWith($img->path, 'http') ? $img->path : Storage::url($img->path) }}" target="_blank">
-                            <img src="{{ Str::startsWith($img->path, 'http') ? $img->path : Storage::url($img->path) }}"
+                    <a href="{{ Str::startsWith($img->path, 'http') ? $img->path : Storage::disk('cloudinary')->url($img->path) }}" target="_blank">
+                             <img src="{{ Str::startsWith($img->path, 'http') ? $img->path : Storage::disk('cloudinary')->url($img->path) }}"
                             class="rounded border shadow-sm"
                             style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
                             alt="Review Image">

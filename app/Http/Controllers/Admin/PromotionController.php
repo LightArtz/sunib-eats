@@ -7,6 +7,8 @@ use App\Models\Promotion;
 use App\Models\Restaurant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Str;
 
 class PromotionController extends Controller
 {
@@ -54,7 +56,10 @@ class PromotionController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $validated['image'] = $request->file('image')->store('promotions', 'cloudinary');
+            $result = cloudinary()->uploadApi()->upload($request->file('image')->getRealPath(), [
+                'folder' => 'promotions'
+            ]);
+            $validated['image'] = $result['secure_url'];
         }
 
         Promotion::create($validated);
@@ -94,10 +99,18 @@ class PromotionController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            if ($promotion->image && Storage::disk('cloudinary')->exists($promotion->image)) {
-                Storage::disk('cloudinary')->delete($promotion->image);
+            if ($promotion->image) {
+                if (Str::startsWith($promotion->image, 'http')) {
+                    $publicId = 'promotions/' . pathinfo($promotion->image, PATHINFO_FILENAME);
+                    cloudinary()->destroy($publicId);
+                } else {
+                    Storage::disk('cloudinary')->delete($promotion->image);
+                }
             }
-            $validated['image'] = $request->file('image')->store('promotions', 'cloudinary');
+            $result = cloudinary()->uploadApi()->upload($request->file('image')->getRealPath(), [
+                'folder' => 'promotions'
+            ]);
+            $validated['image'] = $result['secure_url'];
         }
 
         $promotion->update($validated);
@@ -110,8 +123,13 @@ class PromotionController extends Controller
      */
     public function destroy(Promotion $promotion)
     {
-        if ($promotion->image && Storage::disk('cloudinary')->exists($promotion->image)) {
-            Storage::disk('cloudinary')->delete($promotion->image);
+        if ($promotion->image) {
+            if (Str::startsWith($promotion->image, 'http')) {
+                $publicId = 'promotions/' . pathinfo($promotion->image, PATHINFO_FILENAME);
+                cloudinary()->uploadApi()->destroy($publicId);
+            } else {
+                Storage::disk('cloudinary')->delete($promotion->image);
+            }
         }
         $promotion->delete();
         

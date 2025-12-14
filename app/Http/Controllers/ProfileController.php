@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Str;
 
 class ProfileController extends Controller
 {
@@ -35,14 +37,21 @@ class ProfileController extends Controller
 
             // 1. Hapus gambar profil lama jika ada
             if ($user->profile_picture) {
-                Storage::disk('cloudinary')->delete($user->profile_picture);
+                if (Str::startsWith($user->profile_picture, 'http')) {
+                    $publicId = 'profile-pictures/' . pathinfo($user->profile_picture, PATHINFO_FILENAME);
+                    cloudinary()->uploadApi()->destroy($publicId);
+                } else {
+                    Storage::disk('cloudinary')->delete($user->profile_picture);
+                }
             }
 
-            // 2. Simpan gambar baru dan dapatkan path-nya
-            $path = $request->file('profile_picture')->store('profile-pictures', 'cloudinary');
+            // 2. Simpan gambar baru dan dapatkan URL-nya
+            $result = cloudinary()->uploadApi()->upload($request->file('profile_picture')->getRealPath(), [
+                'folder' => 'profile-pictures'
+            ]);
 
-            // 3. Tambahkan path gambar baru ke data yang akan disimpan
-            $validatedData['profile_picture'] = $path;
+            // 3. Tambahkan URL gambar baru ke data yang akan disimpan
+            $validatedData['profile_picture'] = $result['secure_url'];
         }
 
         // Isi model User dengan data yang sudah divalidasi (termasuk path gambar baru jika ada)
@@ -71,7 +80,12 @@ class ProfileController extends Controller
         $user = $request->user();
 
         if ($user->profile_picture) {
-            Storage::disk('cloudinary')->delete($user->profile_picture);
+            if (Str::startsWith($user->profile_picture, 'http')) {
+                $publicId = 'profile-pictures/' . pathinfo($user->profile_picture, PATHINFO_FILENAME);
+                cloudinary()->uploadApi()->destroy($publicId);
+            } else {
+                Storage::disk('cloudinary')->delete($user->profile_picture);
+            }
         }
 
         Auth::logout();
