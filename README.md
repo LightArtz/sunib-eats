@@ -1,5 +1,5 @@
 # 🍔 Sunib Eats
-https://github.com/LightArtz/sunib-eats
+https://sunib-eats.tech/
 
 **Sunib Eats** is a web-based platform designed to help the Binus University community (specifically around Alam Sutera) discover, review, and recommend the best local dining spots.
 
