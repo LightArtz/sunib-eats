@@ -19,7 +19,7 @@
                 <h2 class="text-lg font-bold text-slate-900 mb-6">User Information</h2>
                 <div class="flex flex-col items-center text-center">
                     @if($review->user->profile_picture)
-                        <img src="{{ Storage::url($review->user->profile_picture) }}" class="w-20 h-20 rounded-full object-cover mb-4" />
+                        <img src="{{ Str::startsWith($review->user->profile_picture, 'http') ? $review->user->profile_picture : Storage::url($review->user->profile_picture) }}" class="w-20 h-20 rounded-full object-cover mb-4" />
                     @else
                         <img src="https://ui-avatars.com/api/?name={{ urlencode($review->user->name) }}&background=random" class="w-20 h-20 rounded-full mb-4" />
                     @endif

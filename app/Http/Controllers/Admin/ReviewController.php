@@ -16,12 +16,16 @@ class ReviewController extends Controller
         $query = Review::with(['user', 'restaurant'])->latest();
 
         // Fitur Search: Cari berdasarkan Nama User atau Nama Restoran
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('user', function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
-            })->orWhereHas('restaurant', function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%");
+
+            $query->where(function ($q) use ($search) {
+                $q->whereHas('user', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%");
+                })
+                ->orWhereHas('restaurant', function ($q2) use ($search) {
+                    $q2->where('name', 'like', "%{$search}%");
+                });
             });
         }
 

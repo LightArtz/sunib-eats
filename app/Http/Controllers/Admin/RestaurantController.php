@@ -8,6 +8,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class RestaurantController extends Controller
 {
@@ -55,8 +56,10 @@ class RestaurantController extends Controller
 
         // Handle Upload Gambar (Jika ada)
         if ($request->hasFile('image_url')) {
-            $path = $request->file('image_url')->store('restaurants', 'public');
-            $validated['image_url'] = $path;
+            $result = cloudinary()->uploadApi()->upload($request->file('image_url')->getRealPath(), [
+                'folder' => 'restaurants'
+            ]);
+            $validated['image_url'] = $result['secure_url'];
         }
 
         // Generate Slug Otomatis
@@ -111,11 +114,18 @@ class RestaurantController extends Controller
 
         // Handle Gambar Baru (Hapus yang lama jika ada)
         if ($request->hasFile('image_url')) {
-            if ($restaurant->image_url && Storage::disk('public')->exists($restaurant->image_url)) {
-                Storage::disk('public')->delete($restaurant->image_url);
+            if ($restaurant->image_url) {
+                if (Str::startsWith($restaurant->image_url, 'http')) {
+                    $publicId = 'restaurants/' . pathinfo($restaurant->image_url, PATHINFO_FILENAME);
+                    cloudinary()->uploadApi()->destroy($publicId);
+                } else {
+                    Storage::disk('cloudinary')->delete($restaurant->image_url);
+                }
             }
-            $path = $request->file('image_url')->store('restaurants', 'public');
-            $validated['image_url'] = $path;
+            $result = cloudinary()->uploadApi()->upload($request->file('image_url')->getRealPath(), [
+                'folder' => 'restaurants'
+            ]);
+            $validated['image_url'] = $result['secure_url'];
         }
 
         $validated['slug'] = Str::slug($request->name);
@@ -136,8 +146,13 @@ class RestaurantController extends Controller
     public function destroy(Restaurant $restaurant)
     {
         // Hapus gambar dari storage saat data dihapus
-        if ($restaurant->image_url && Storage::disk('public')->exists($restaurant->image_url)) {
-            Storage::disk('public')->delete($restaurant->image_url);
+        if ($restaurant->image_url) {
+            if (Str::startsWith($restaurant->image_url, 'http')) {
+                $publicId = 'restaurants/' . pathinfo($restaurant->image_url, PATHINFO_FILENAME);
+                cloudinary()->destroy($publicId);
+            } else {
+                Storage::disk('cloudinary')->delete($restaurant->image_url);
+            }
         }
         
         $restaurant->delete();

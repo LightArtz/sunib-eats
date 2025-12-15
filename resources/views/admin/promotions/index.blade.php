@@ -49,8 +49,8 @@
                                 <td class="px-6 py-4">
                                     @if($promotion->image)
                                         <img 
-                                            src="{{ Str::startsWith($promotion->image, 'http') ? $promotion->image : Storage::url($promotion->image) }}" 
-                                            alt="Promotion" 
+                                             
+                                            alt="Promotion" src="{{ Str::startsWith($promotion->image, 'http') ? $promotion->image : Storage::disk('cloudinary')->url($promotion->image) }}"
                                             class="w-12 h-12 rounded-lg object-cover" 
                                         />
                                     @else

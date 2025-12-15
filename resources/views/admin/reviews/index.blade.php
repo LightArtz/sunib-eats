@@ -45,7 +45,7 @@
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         @if($review->user->profile_picture)
-                                            <img src="{{ Storage::url($review->user->profile_picture) }}" class="w-10 h-10 rounded-full object-cover" />
+                                            <img src="{{ Str::startsWith($review->user->profile_picture, 'http') ? $review->user->profile_picture : Storage::url($review->user->profile_picture) }}" class="w-10 h-10 rounded-full object-cover" />
                                         @else
                                             <img src="https://ui-avatars.com/api/?name={{ urlencode($review->user->name) }}&background=random" class="w-10 h-10 rounded-full" />
                                         @endif

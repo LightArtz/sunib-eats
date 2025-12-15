@@ -12,7 +12,7 @@
                     <div class="card-body">
                         <div class="position-relative d-inline-block mb-3">
                             @if($user->profile_picture)
-                                <img src="{{ asset('storage/' . $user->profile_picture) }}" 
+                                <img src="{{ Str::startsWith($user->profile_picture, 'http') ? $user->profile_picture : Storage::disk('cloudinary')->url($user->profile_picture) }}"
                                      alt="{{ $user->name }}" 
                                      class="rounded-circle object-fit-cover shadow-sm"
                                      style="width: 120px; height: 120px;">

@@ -39,7 +39,11 @@
 
                                     @foreach($review->images as $img)
                                     <div class="preview-box existing-image"
-                                        style="background-image: url('{{ asset('storage/' . $img->path) }}');">
+                                        style="background-image: url('{{ 
+                                            Str::startsWith($img->path, 'http') 
+                                                ? $img->path 
+                                                : Storage::url($img->path) 
+                                        }}');">
 
                                         <div class="remove-btn" onclick="removeExistingImage(this, '{{ $img->id }}')">
                                             <i class="bi bi-x"></i>

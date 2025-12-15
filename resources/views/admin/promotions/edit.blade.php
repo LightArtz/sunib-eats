@@ -53,7 +53,7 @@
 
                 <div class="space-y-6">
                     <div 
-                        x-data="{ imagePreview: '{{ $promotion->image ? (Str::startsWith($promotion->image, 'http') ? $promotion->image : Storage::url($promotion->image)) : "" }}' }" 
+                        x-data="{ imagePreview: '{{ $promotion->image ? (Str::startsWith($promotion->image, 'http') ? $promotion->image : Storage::disk('cloudinary')->url($promotion->image)) : "" }}' }" 
                         class="bg-slate-50 p-6 rounded-lg border-2 border-dashed border-slate-300 hover:border-indigo-500 transition cursor-pointer relative"
                         @click="$refs.fileInput.click()"
                     >
