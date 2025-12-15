@@ -3,9 +3,10 @@
 <div class="d-flex mb-4 border-bottom pb-3">
     <div class="flex-shrink-0 text-center" style="width: 60px;">
         @if($review->user->profile_picture)
-        <a href="{{ Str::startsWith($img->path, 'http') ? $img->path : Storage::url($img->path) }}" target="_blank">
-            <img src="{{ Str::startsWith($img->path, 'http') ? $img->path : Storage::url($img->path) }}" class="rounded-circle shadow-sm" style="width: 50px; height: 50px; object-fit: cover;">
-        </a>
+            <img src="{{ Str::startsWith($review->user->profile_picture, 'http') ? $review->user->profile_picture : Storage::disk('cloudinary')->url($review->user->profile_picture) }}" 
+                class="rounded-circle shadow-sm" 
+                style="width: 50px; height: 50px; object-fit: cover;" 
+                alt="{{ $review->user->name }}">
         @else
         <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto shadow-sm" style="width: 50px; height: 50px; font-size: 1.2rem;">
             {{ substr($review->user->name, 0, 1) }}
