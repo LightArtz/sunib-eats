@@ -1,4 +1,5 @@
 # 🍔 Sunib Eats
+https://github.com/LightArtz/sunib-eats
 
 **Sunib Eats** is a web-based platform designed to help the Binus University community (specifically around Alam Sutera) discover, review, and recommend the best local dining spots.
 
@@ -209,14 +210,4 @@ app/
 
 routes/
 └── web.php                     # Public, Auth, and Admin routes
-```
-
----
-
----
-
-## 📄 License
-
-This project is open-source software licensed under the **MIT License**.
-
 ```
