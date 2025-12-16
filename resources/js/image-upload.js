@@ -1,33 +1,27 @@
 document.addEventListener('DOMContentLoaded', function () {    
     const container = document.getElementById('image-upload-container');
     const addBtn = document.getElementById('add-image-btn');    
-    const finalInput = document.getElementById('final-upload-input'); // Input Asli
-    const selectorInput = document.getElementById('file-selector');   // Dummy Trigger
+    const finalInput = document.getElementById('final-upload-input'); 
+    const selectorInput = document.getElementById('file-selector');
 
     if (!container || !finalInput || !addBtn || !selectorInput) return;
 
-    const dt = new DataTransfer(); // Penampung File
+    const dt = new DataTransfer(); 
     const maxImages = 3;
 
-    // Expose fungsi ini agar bisa dipanggil dari review-edit.js (saat hapus gambar lama)
     window.checkImageUploadLimit = checkMaxLimit;
 
-    // Trigger dummy input
     addBtn.addEventListener('click', function () {
         selectorInput.click();
     });
 
-    // Saat user memilih file baru
     selectorInput.addEventListener('change', function (event) {        
-        // Hitung total saat ini (Gambar Lama yg belum dihapus + Gambar Baru di DT)
         const existingCount = document.querySelectorAll('.preview-box.existing-image:not([style*="display: none"])').length;
-        // Gunakan 'let' karena nilainya akan berubah
         let currentTotal = existingCount + dt.items.length;
 
         for (let i = 0; i < this.files.length; i++) {
             const file = this.files[i];
 
-            // Cek Limit
             if (currentTotal + 1 > maxImages) {
                 alert(`Maksimal hanya ${maxImages} gambar!`);
                 break;
@@ -37,23 +31,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 continue;
             }
 
-            // Tambahkan ke DataTransfer
             dt.items.add(file);
             
-            // Tampilkan Preview
             createPreview(file);
             
-            // Increment
             currentTotal++; 
         }
 
-        // Update Input Asli
         finalInput.files = dt.files;
         
-        // Cek apakah tombol (+) harus hilang
         checkMaxLimit();
         
-        // Reset dummy input agar bisa pilih file yang sama lagi
         this.value = '';
     });
 
@@ -71,9 +59,8 @@ document.addEventListener('DOMContentLoaded', function () {
         removeBtn.classList.add('remove-btn');
         removeBtn.innerHTML = '<i class="bi bi-x"></i>';
 
-        // Event Hapus Gambar Baru
         removeBtn.addEventListener('click', function (e) {
-            e.stopPropagation(); // Mencegah bubbling
+            e.stopPropagation(); 
             removeImage(file, previewDiv);
         });
 
@@ -82,19 +69,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function removeImage(fileToRemove, previewElement) {
-        // Hapus dari DataTransfer
         for (let i = 0; i < dt.items.length; i++) {
-            // Perbandingan file object
             if (dt.items[i].getAsFile() === fileToRemove) {
                 dt.items.remove(i);
                 break;
             }
         }
         
-        // Hapus elemen visual
         previewElement.remove();
         
-        // Update Input Asli (PENTING AGAR CONTROLLER TERIMA PERUBAHAN)
         finalInput.files = dt.files;
         
         checkMaxLimit();
@@ -111,6 +94,5 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Jalankan sekali saat load
     checkMaxLimit();
 });
