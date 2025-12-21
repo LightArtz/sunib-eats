@@ -245,10 +245,10 @@ class RestaurantSeeder extends Seeder
                 'slug' => Str::slug($item['name']),
                 'location' => $item['location'],
                 'description' => $item['description'],
-                'avg_rating' => $item['avg_rating'],
+                'avg_rating' => 5,
                 'avg_price' => $item['avg_price'],
                 'image_url' => $item['image_url'],
-                'total_reviews' => rand(10, 100),
+                'total_reviews' => 0,
                 'hot_score' => rand(0, 100),
                 'approved' => true,
             ]);
